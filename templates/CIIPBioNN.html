@@ -1,0 +1,199 @@
+{% extends "template.html" %}
+{% block content %}
+<div name= "p1" style="margin-left: 5px; margin-right: 5px; margin-bottom: 20px">
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{ error }}
+		{% endif %}	
+    <div class="container-fluid" style="height: 100%">
+        <div class="row">
+
+            <div class="col-lg-1" style="width: 40%; background-color: #E0E0E0; border: 1px solid black;">
+                <p>
+                <form action="/CIIPBioNNer" method="post" enctype="multipart/form-data">
+
+                <b>Step 1.</b> Select Profile.
+                 <div class="row" >
+ 
+			<div class="col-sm-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+
+			{% if profiles %}
+  				{% for profile in profiles %}
+                                  {% if profiles.index(profile) == 0 %}  
+        				<input type="radio" name="profile_filename" value="{{ profile }}" checked="checked"> {{ profile }}
+        				</input><br>
+                                  {% else %}
+        				<input type="radio" name="profile_filename" value="{{ profile }}"> {{ profile }}
+        				</input><br>
+                                  {% endif %}  
+				{%  endfor %}
+                      <!-- <input type="submit" name="Submit" value="Delete"/>   -->
+			{% endif  %}
+
+			{% if not profiles %}
+                        Please profile a dataset.
+			{% endif  %}
+			</div>
+
+                  </div>
+	<br>
+
+
+
+	
+        	<b>Step 2.</b> Set Biological Nearest Neighbor Parameters.
+		<div class="row">
+
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				Minimum biological similarity for nearest neighbor calculation: <br>
+				<br>
+                		<select  name="cutoff">
+				    <option value="0.50">0.50</option>
+				    <option value="0.55">0.55</option>
+				    <option value="0.60">0.60</option>
+				    <option value="0.65">0.65</option>
+				    <option value="0.70">0.70</option>
+				    <option value="0.75">0.75</option>
+				    <option value="0.80">0.80</option>
+				    <option value="0.85">0.85</option>
+				    <option value="0.90">0.90</option>
+				    <option value="0.95">0.95</option>
+				    <option value="1.0">1.0</option>
+				</select>  
+			</div>
+
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+                		Please enter a confidence: <br>
+				<br>
+                 		<select  name="conf">
+				    <option value="0.00">0%</option>
+				    <option value="0.05">5%</option>
+				    <option value="0.10">10%</option>
+				    <option value="0.15">15%</option>
+				    <option value="0.20">20%</option>
+				    <option value="0.25">25%</option>
+				    <option value="0.30">30%</option>
+				    <option value="0.35">35%</option>
+				    <option value="0.40">40%</option>
+				    <option value="0.45">45%</option>
+				    <option value="0.50">50%</option>
+				    <option value="0.55">55%</option>
+				    <option value="0.60">60%</option>
+				    <option value="0.65">65%</option>
+				    <option value="0.70">70%</option>
+				    <option value="0.75">75%</option>
+				    <option value="0.80">80%</option>
+				    <option value="0.85">85%</option>
+				    <option value="0.90">90%</option>
+				    <option value="0.95">95%</option>
+				    <option value="1.0">100%</option>
+				</select>                						
+			</div>
+		</div>
+	<br>
+
+
+        	<b>Step 3.</b> Biological Activity Predictor.<br>
+		<div class="row">
+
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Choose test set to predict:</b><br>
+    	       {% if testsets %}  
+                		Avaialable datasets for <b>{{ username }}</b>:<br>
+        		{% for testset in testsets %}
+                            {% if testsets.index(testset) == 0 %}
+				<input type="radio" name="compound_filename" value="{{ testset }}" checked="checked"> {{ testset }}
+				</input><br>
+                            {% else %}
+				<input type="radio" name="compound_filename" value="{{ testset }}"> {{ testset }}
+				</input><br>
+                            {% endif %}
+    		      {% endfor %}
+              {% endif %}
+                            {% if not testsets %}
+
+                            No available test sets.  Please upload.
+                            {% endif %}
+			</div>
+				
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Number of nearest neighbors to be used for BioNN activity averages:</b> <br>
+				<select name="nns">
+ 				    <option value="1">1</option>
+				    <option value="2">2</option>
+				    <option value="3">3</option>
+				    <option value="4">4</option>
+				    <option value="5">5</option>
+				</select>
+			</div>
+
+		</div>
+	<br>
+	
+
+
+
+        	<b>Step 5.</b> Choose output format and submit
+		<div class="row">
+			
+			<div class="col-sm-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+			<input type="submit" value="Submit" name="Submit"/>
+			</div> 	
+			
+		</div>
+
+
+ 
+        </div>
+	</form>
+	</p>
+     {% if sim_graph %}  
+
+            <div class="row" > 
+                <div class="col-lg">
+            	       {{ sim_graph|safe }}
+                </div>
+            </div>
+
+    {% endif %}
+{% if cids %}
+            <div class="col-lg-1" style="width: 40%;">                
+
+		</div>
+             <div class="col-lg-2" style="width: 30%;">
+
+			{% if cids %}
+            
+                        <br>
+                        <table style="width: 100%; border: 1px solid blue;">
+
+				<tr style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+                                <th style="width: 20%; background-color: LightGray; border: 1px solid blue;"><b>CID</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>Experimental</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>CIIP BioNN Activity</b></th>
+				</tr>
+
+                            {% for i in range(0, len_cids) %}			   
+				<tr style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+                                {% if NN_bool[i]  %}
+                                <td style="width: 20%; background-color: LightGray; border: 1px solid blue;"><a href="/similarity{{ cids[i] }}" target="_blank">{{ cids[i] }}</a></td>
+                                {% else %}
+                                <td style="width: 20%; background-color: LightGray; border: 1px solid blue;">{{ cids[i] }}</td>
+                                {% endif %}
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ acts[i] }}</td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ preds[i] }}</td>
+				</tr>
+			    {% endfor %}
+			</table>
+			{% endif %}
+		</div>
+
+
+              </div>
+            
+  
+  
+    {% endif %}
+ </div>
+</div>         
+</div>
+{% endblock %}

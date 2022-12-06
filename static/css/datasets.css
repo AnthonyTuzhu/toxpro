@@ -1,0 +1,19 @@
+
+.radio-inline {
+    margin-top:10px;
+    margin-left:5px;
+    margin-right:5px;
+}
+
+#cmp-id-sel {
+ width: 20%;
+}
+
+.my-custom-scrollbar {
+position: relative;
+height: 400px;
+overflow: auto;
+}
+.table-wrapper-scroll-y {
+display: block;
+}

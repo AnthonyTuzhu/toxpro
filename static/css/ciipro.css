@@ -1,0 +1,155 @@
+
+body {
+    background-color: #F0F0F0;
+}
+
+/*.card {*/
+    /*border-color: #05056F;*/
+    /*border-width: 1px;*/
+/*}*/
+
+/* add a little margin for some rows */
+.top-buffer {
+    margin-top:20px;
+}
+
+.btn-padding {
+    margin-top:10px;
+}
+
+.top-padding {
+    margin-top:10px;
+}
+
+btm-padding {
+    margin-bottom: 10px;
+}
+
+
+.panel-primary {
+    color: #05056F;
+    border-color: #05056F;
+    background-color: #F0F0F0;
+}
+
+.panel-primary .panel-heading{
+    background-color: #05056F;
+    color: #F0F0F0;
+}
+
+.btn-primary {
+    background-color: #05056F;
+    border: none;
+}
+
+.btn-info {
+    background-color: #6FA5FF;
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: #05056F;
+    border: none;
+}
+
+.btn-info:active {
+    background-color: #6FA5FF;
+}
+
+.btn-info:focus {
+    background-color: #6FA5FF;
+}
+
+.btn-primary:hover {
+    background-color: #6FA5FF;
+    border: #05056F;
+}
+
+.btn-primary:active {
+    background-color: #F0F0F0;
+    color: #05056F;
+    border: none;
+}
+
+.btn-primary:focus {
+    background-color: #F0F0F0;
+    color: #05056F;
+    border: none;
+}
+
+.navbar-brand {
+    color: #05056F;
+    font-size: 25px;
+}
+
+.navbar {
+    color: #0505FF;
+    font-size: 20px;
+}
+
+/* for the home page */
+
+.ciipro-overview h3 {
+    color:#05056F;
+    text-align: center
+}
+
+.ciipro-overview p {
+    color:#05056F;
+    text-align: center
+}
+
+
+/* profile page */
+
+.profile {
+
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+/* opimizer page */
+
+.optimizer {
+    padding-left: 50px;
+    padding-right: 50px;
+    margin-bottom: 10em;
+}
+
+/* for flashed messages */
+.alert-info {
+    background-color: #6FA5FF;
+    border: none;
+    color: white;
+}
+
+#divLoading
+{
+display : none;
+}
+#divLoading.show
+{
+display : block;
+position : fixed;
+z-index: 100;
+background-image : url('/static/img/loading-bar.gif');
+background-color:#666;
+opacity : 0.4;
+background-repeat : no-repeat;
+background-position : center;
+left : 0;
+bottom : 0;
+right : 0;
+top : 0;
+}
+#loadinggif.show
+{
+left : 50%;
+top : 50%;
+position : absolute;
+z-index : 101;
+width : 32px;
+height : 32px;
+margin-left : -16px;
+margin-top : -16px;
+}

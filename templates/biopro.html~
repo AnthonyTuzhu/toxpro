@@ -1,0 +1,124 @@
+{% extends "template.html" %}
+{% block content %}
+<div name= "p1" style="margin-left: 5px; margin-right: 5px;">
+    <div class="container-fluid" style="height: 100%">
+        <div class="row">
+
+            <div class="col-lg-2" style="width: 50%; background-color: #E0E0E0; border: 1px solid black;">
+                <p>
+                <form action="/action" method="post" enctype="multipart/form-data">
+
+                <b>Step 1.</b> Select Input Type.
+                 <div class="row" >
+ 
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+				<input type="radio" name="input_type" value="CAS"> CAS Registry Number
+				</input><br>
+				<input type="radio" name="input_type" value="CID"> PubChem CID
+				</input><br> 
+				<input type="radio" name="input_type" value="name"> IUPAC Name
+				</input><br>
+				<input type="radio" name="input_type" value="smiles"> Canonical SMILES
+				</input><br>
+				<input type="radio" name="input_type" value="inchikey"> InChIKey
+				</input><br>
+			</div>
+
+                  </div>
+	<br>
+
+        	<b>Step 2.</b> Provide Compounds	
+		<div class="row equal">
+
+			<div class="col-md-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Please enter compounds:</b><br> 
+				(Up to 50 compounds seperated by a newline)<br>
+				<textarea cols="20" rows="5" name-"compounds">
+				</textarea>
+			</div>
+
+			<div class="col-md-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Or Upload a file here:</b> 
+				<br>
+				<input type="file" name="compound_file"/>
+			</div>
+		</div>
+	<br>
+
+	
+        	<b>Step 3.</b> Set Biological Profiling Parameters
+		<div class="row">
+
+			<div class="col-md-3" style="width: 33.3%; background-color: LightGray; border: 1px solid blue;">
+				Select number of actives to be considered for each bioassay:<br>
+				<br>
+				<b>Note:</b> Please enter number as an integer (i.e. 5) <br>
+				<input type="text" name="noOfActives"/> <br>
+			</div>
+
+			<div class="col-md-3" style="width: 33.3%; background-color: LightGray; border: 1px solid blue;">
+				Minimum biological similarity for nearest neighbor calucation: <br>
+				<br>
+                		<b>Note:</b> Please enter number as a floating number (i.e. 0.7) <br>
+                		<input type='text' name="cutoff"/> <br>
+			</div>
+
+			<div class="col-md-3" style="width: 33.3%; background-color: LightGray; border: 1px solid blue;">
+                		Please enter a confidence cutoff: <br>
+				<br>
+				<br>
+                		<b>Note:</b> Please enter number as an integer (i.e. 5) <br>
+                		<input type='text' name="conf"/> <br>				
+			</div>
+		</div>
+	<br>
+
+
+        	<b>Step 4.</b> Prediction parameters
+		<div class="row">
+
+			<div class="col-md-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Upload Activity file here:</b><br>
+					<br>
+					<input type="file" name="activity_file"/>
+						<input type="radio" name="act_delimit" value="act_comma"> CSV (Comma delimted)
+						</input><br>
+						<input type="radio" name="act_delimit" value="act_tab"> TSV (Tab delimted)
+						</input><br> 
+			</div>
+				
+			<div class="col-md-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Number of nearest neighbors to be used for predictions:</b> <br>
+				<br>
+                		<b>Note:</b> Please enter number as a floating number (i.e. 0.7) <br>
+                		<input type='text' name="cutoff"/> <br>
+			</div>
+
+		</div>
+	<br>
+	
+        	<b>Step 5.</b> Choose output format and submit
+		<div class="row">
+			
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+			<b>Choose output format:</b><br>
+				<br>
+				<input type="radio" name="act_delimit" value="act_comma"> CSV (Comma delimted)
+				</input><br>
+				<input type="radio" name="act_delimit" value="act_tab"> TSV (Tab delimted)
+				</input><br>
+			<input type="submit" value = "Submit" name="user_input"/>
+			</div> 	
+			
+		</div>
+	</form>
+	</p>
+
+
+        <div class="col-lg-2" style:"width: 50%">
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

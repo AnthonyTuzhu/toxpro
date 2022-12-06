@@ -1,0 +1,89 @@
+{% extends "template.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profiler.css') }}">
+<div id="divLoading">
+
+</div>
+<div class="profile-body" id="profile-content">
+<form action="/ciiprofile" method="post" enctype="multipart/form-data" name="">
+    <div class="row">
+      <div class="col-sm-6">
+        <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+          <div class="card-body">
+            <h5 class="card-title">Available datasets</h5>
+              {% if not datasets %}
+                  <p class="card-text">No training sets available.  Please upload.</p>
+              {% endif %}
+              {% if datasets %}
+                <div class="form-group">
+                  <label for="sel1">Select dataset:</label>
+                  <select class="form-control" id="compound_filename" name="compound_filename">
+                    {% for dataset in datasets %}
+                        <option value="{{ dataset }}"> {{ dataset }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+             {%  endif %}
+            <input type="submit" class="btn btn-primary btn-padding" value="Profile dataset" onclick="loading()"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <div class="card shadow p-3 mb-5 bg-white rounded">
+          <div class="card-body">
+              <h5 class="card-title">Profiling parameters</h5>
+              <p class="card-text">Set the biological profiling parameters.</p>
+
+              <div class="form-group">
+                  <label for="noOfActives">Set the miniumum number of actives per assay:</label>
+                  <input style="margin-left: 20px" type="number" value="6" name="noOfActives" min="0" max="30" step="1"/>
+              </div>
+
+              <div class="form-group">
+                  <label for="profile_filename">Give a name to the profile:</label>
+                  <input style="margin-left: 20px"
+                         size=60 type="text" id="profile_filename" name="profile_filename" />
+              </div>
+
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+</form>
+
+
+</div>
+
+    <script>
+    n =  new Date();
+    y = n.getFullYear();
+    m = n.getMonth() + 1;
+    d = n.getDate();
+
+
+
+    // add event listenter to selected
+
+    selector = $("#compound_filename");
+
+    function changeProfileName() {
+        currentProfile = selector.find(":selected").text();
+        clusteringFilename = $("#profile_filename");
+        clusteringFilename.val(currentProfile + "_profile_" + m + "_" + d + "_" + y);
+
+    };
+
+    changeProfileName();
+    selector.on("change", function() {
+            changeProfileName();
+        });
+
+
+
+    </script>
+
+{% endblock %}

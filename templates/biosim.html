@@ -1,0 +1,22 @@
+{% extends "template.html" %}
+{% block content %}
+<head>
+  <meta charset="utf-8">
+  <title>Chemical In Vitro/In Vivo Profiling</title>
+  <body>
+  <div id="page-wrapper">
+    <h1>Biological Similarity</h1>
+            <br>
+      <form action="/getbiosim" method="post" enctype="multipart/form-data">
+            Click to download biological similarity <br>
+            <input type="submit" value="Download BioSim" name="BioSim"/> <br>
+      </form>          
+      		Click button to download the confidence file <br>
+      <form action="/DLBioSimConf" method="post">
+            <input type="submit" value = "Download Conf" name="Dl Conf"/>
+      </form> 
+  </div>
+
+ </body>
+</html>
+{% endblock %}		

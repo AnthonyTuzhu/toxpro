@@ -1,0 +1,118 @@
+{% extends "template.html" %}
+{% block content %}
+<head>
+  <meta charset="utf-8">
+  <title>Chemical In Vitro/In Vivo Profiling</title>
+  <body>
+	<div class="container-fluid">
+	
+	<p >
+	<form action="/action" method="post" enctype="multipart/form-data">
+
+	<b>Step 1.</b> Select Input Type.
+		<div class="row">
+			<div class="col-md-1" style="width: 25%; background-color: LightGray; border: 1px solid blue;">
+				<input type="radio" name="input_type" value="CAS"> CAS Registry Number
+				</input><br>
+				<input type="radio" name="input_type" value="CID"> PubChem CID
+				</input><br> 
+				<input type="radio" name="input_type" value="name"> IUPAC Name
+				</input><br>
+				<input type="radio" name="input_type" value="smiles"> Canonical SMILES
+				</input><br>
+				<input type="radio" name="input_type" value="inchikey"> InChIKey
+				</input><br>
+			</div>
+		</div>
+	<br>
+
+	<b>Step 2.</b> Provide Compounds	
+
+		<div class="row">
+			<div class="col-md-2" style="width: 40%; background-color: LightGray; border: 1px solid blue;">
+				<b>Please enter compounds:</b><br> 
+				(Up to 50 compounds seperated by a newline)<br>
+				<textarea cols="20" rows="5" name-"compounds">
+				</textarea>
+			</div>
+
+			<div class="col-md-2" style="width: 20%; background-color: LightGray; border: 1px solid blue;">
+				<b>Or Upload a file here:</b> 
+			<br>
+				<input type="file" name="compound_file"/>
+			</div>
+		</div>
+	<br>
+
+	
+	<b>Step 3.</b> Set Biological Profiling Parameters
+		<div class="row">
+
+			<div class="col-md-3" style="width: 30%; background-color: LightGray; border: 1px solid blue;">
+				Select number of actives to be considered for each bioassay:<br>
+				<br>
+				<b>Note:</b> Please enter number as an integer (i.e. 5) <br>
+				<input type="text" name="noOfActives"/> <br>
+			</div>
+
+			<div class="col-md-3" style="width: 30%; background-color: LightGray; border: 1px solid blue;">
+				Minimum biological similarity for nearest neighbor calucation: <br>
+                		<b>Note:</b> Please enter number as a floating number (i.e. 0.7) <br>
+                		<input type='text' name="cutoff"/> <br>
+			</div>
+
+			<div class="col-md-3" style="width: 30%; background-color: LightGray; border: 1px solid blue;">
+                		Please enter a confidence cutoff: <br>
+				<br>
+				<br>
+                		<b>Note:</b> Please enter number as an integer (i.e. 5) <br>
+                		<input type='text' name="conf"/> <br>				
+			</div>
+		</div>
+	<br>
+
+
+	<b>Step 4.</b> Prediction parameters
+		<div class="row">
+
+			<div class="col-md-2" style="width: 40%; background-color: LightGray; border: 1px solid blue;">
+				<b>Upload Activity file here:</b><br>
+					<input type="file" name="activity_file"/>
+						<input type="radio" name="act_delimit" value="act_comma"> CSV (Comma delimted)
+						</input><br>
+						<input type="radio" name="act_delimit" value="act_tab"> TSV (Tab delimted)
+						</input><br> 
+			</div>
+				
+			<div class="col-md-2" style="width: 40%; background-color: LightGray; border: 1px solid blue;">
+				Number of nearest neighbors to be used for predictions: <br>
+				<br>
+                		<b>Note:</b> Please enter number as a floating number (i.e. 0.7) <br>
+                		<input type='text' name="cutoff"/> <br>
+			</div>
+
+		</div>
+	<br>
+	
+	<b>Step 5.</b> Choose output format and submit
+		<div class="row">
+			
+			<div class="col-md-1" style="width: 30%; background-color: LightGray; border: 1px solid blue;">
+			Choose output format:<br>
+				<input type="radio" name="act_delimit" value="act_comma"> CSV (Comma delimted)
+				</input><br>
+				<input type="radio" name="act_delimit" value="act_tab"> TSV (Tab delimted)
+				</input><br>
+			<input type="submit" value = "Submit" name="user_input"/>
+			</div> 	
+			
+		</div>
+	</form>
+	</p>
+
+
+
+	</div>
+ </body>
+</html>
+{% endblock %}		

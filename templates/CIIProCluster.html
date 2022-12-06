@@ -1,0 +1,236 @@
+{% extends "template.html" %}
+{% block content %}
+
+<script src="../static/js/requests.js"></script>
+<script src="../static/js/cluster.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cluster.css') }}">
+
+
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
+<div id="divLoading">
+
+</div>
+
+<div class="cluster-body" >
+
+    <form action="/CIIPro_Cluster" method="post" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                <h5 class="card-title">Available profiles</h5>
+                  {% if not profiles %}
+                      <p class="card-text">No profiles available.</p>
+                  {% endif %}
+                  {% if profiles %}
+                    <div class="form-group">
+                      <label for="sel1">Select profile:</label>
+                      <select class="form-control" name="profile_filename" id="profile-selection">
+                        {% for profile in profiles %}
+                            <option value="{{ profile }}"> {{ profile }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                 {%  endif %}
+                <div class="form-group">
+                  <label for="clustering_filename">Give a name to the clustering:</label>
+                  <input style="margin-left: 20px" type="text"
+                         size=30 id="clustering_filename" name="clustering_filename" />
+
+                </div>
+
+                <input type="submit" class="btn btn-primary btn-padding"
+                       value="Cluster profile" onclick="loading()"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+              <div class="card-body">
+                <h5 class="card-title">Profile overview</h5>
+                  <h6 id="ts_used">Training Set Used:  <span id="this_ts" class="prof-attr text-muted"></span></h6>
+                  <h6 id="num_cmps">Num Compounds:  <span id="cmps" class="prof-attr text-muted"></span></h6>
+                  <h6 id="num_aids">Num Assays:  <span id="aids" class="prof-attr text-muted"></span></h6>
+                  <h6 id="total_acts">Total Active Responses: <span id="tot_acts" class="prof-attr text-muted"></span></h6>
+                  <h6 id="total_inacts">Total Inactive Responses: <span id="tot_inacts" class="prof-attr text-muted"></span></h6>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                <h5 class="card-title">Define clusters</h5>
+                  {% if not clusters %}
+                      <p class="card-text">No clusterings available available.</p>
+                  {% endif %}
+                  {% if clusters %}
+                    <div class="form-group">
+                      <label for="cluster-selection">Select cluster:</label>
+                      <select class="form-control" name="clustering" id="cluster-selection">
+                        {% for cluster in clusters %}
+                            <option value="{{ cluster }}"> {{ cluster }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                 {%  endif %}
+
+                <div class="slidecontainer">
+                  <label for="cluster-slider">Select Number of Clusters:</label><br>
+                  <input type="range" min="1" max="10" value="1" class="slider" id="cluster-slider"><br>
+
+                    <p>Current Clusters: <span id="noClusters"></span></p>
+
+                </div>
+                <input type="button" class="btn btn-primary btn-padding"
+                       value="Save clusters" onclick="sendClusterData()"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+              <div class="card-body" id="cluster-graph-card-body">
+                <div id="cluster-graph">
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+    </form>
+</div>
+<script>
+
+    var profileSelector = $("#profile-selection");
+
+    var currentClustering = $("#cluster-selection").find(":selected").text().trim();
+
+
+    var queryUrl = $SCRIPT_ROOT + "get_adj_matrix/" + currentClustering;
+    var graph = JSON.parse(getResponseFromURL(queryUrl));
+    var sliderPreviousIdx = graph.nodes.length;
+    var maxClusters = graph.nodes.length;
+
+    networkGraph(graph);
+
+    refreshProfileClusterPage();
+    changeClusteringName();
+    networkGraph(graph);
+
+    profileSelector.on("change", function() {
+        refreshProfileClusterPage();
+        changeClusteringName();
+    });
+
+
+    $("#cluster-slider").attr("max", graph.nodes.length);
+    $("#cluster-slider").val(graph.nodes.length);
+    $("#noClusters").text($("#cluster-slider").val());
+
+    $("#cluster-selection").on("change", function() {
+
+        currentClustering = $(this).val().trim();
+        queryUrl = $SCRIPT_ROOT + "get_adj_matrix/" + currentClustering;
+        graph = JSON.parse(getResponseFromURL(queryUrl));
+        sliderPreviousIdx = graph.nodes.length;
+        maxClusters = graph.nodes.length;
+        networkGraph(graph);
+
+        $("#cluster-slider").attr("max", graph.nodes.length);
+        $("#cluster-slider").val(graph.nodes.length);
+        $("#noClusters").text($("#cluster-slider").val());
+
+    });
+
+
+
+
+
+
+    function createClusters(currentIdx, prevIdx) {
+        // This is the main function for merging clusters as defined by the cluster-slider bar
+        // on the cluster page. It takes two parameters, the previous index (prevIdx) and the index to merge
+        // to (currentIdx).  The number of possible clusters are 1 - the number of nodes in the graph.
+
+        // special case of wanting to have each cluster independent.  if this is the case
+        // just define each cluster as its index.
+        console.log(currentIdx, prevIdx);
+
+        for (var i = 0; i < graph.nodes.length; i++) {
+
+            // graph.nodes[i].class = graph.nodes[i].index;
+            graph.nodes[i].prevClass = graph.nodes[i].class;
+        }
+
+        if (currentIdx == maxClusters) {
+            for (var idx = 0; idx < graph.nodes.length; idx++) {
+                graph.nodes[idx].class = graph.nodes[idx].index;
+            }
+        }
+        else {
+            // if prevIdx is greater than currentIdx, it means the user wants to merge cluster.  Since the function
+            // merge() merges clusters at a given step, we need to call this function for each step from the previous
+            // index to the current index.  However, the indexes are off a bit.  merge(0) will merge the two closest nodes,
+            // results in n-1 clusters, so we need to reverse the the indices.
+            console.log(currentIdx < prevIdx)
+            if (currentIdx < prevIdx) {
+                console.log(currentIdx, prevIdx);
+                var startingIdx = maxClusters-prevIdx;
+                var endingIdx = maxClusters-currentIdx;
+
+                for (var idx = startingIdx; idx < endingIdx; idx++) {
+                    merge(graph, idx);
+                }
+
+            }
+
+            else if (currentIdx > prevIdx) {
+                var startingIdx = maxClusters-prevIdx-1;
+                var endingIdx = maxClusters-currentIdx-1;
+                for (var idx = startingIdx; idx > endingIdx; idx--) {
+                    console.log(idx)
+                    unmerge(graph, idx);
+                }
+
+            }
+        }
+        for (var i = 0; i < graph.nodes.length; i++) {
+            if (graph.nodes[i].class != graph.nodes[i].prevClass) {
+                graph.nodes[i].isChanged = true;
+            } else {
+                graph.nodes[i].isChanged = false;
+            }
+
+        }
+    }
+
+
+    $("#cluster-slider").on("change", function() {
+        createClusters(+$(this).val(), +sliderPreviousIdx);
+        $("#noClusters").text($("#cluster-slider").val());
+        sliderPreviousIdx = $(this).val();
+        updateColors();
+    });
+
+
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+

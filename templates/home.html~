@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="jumbo" style="margin-left: 100px; margin-right: 100px;">
+		<p>
+		<center>
+		<h3>What is CIIPro?</h3>
+		</center>
+		<br>
+		Welcome to the chemical <i>In vitro</i>, <i>In vivo</i> Profiling (CIIPro) project.  CIIPro is a cheminformatics web tool designed to link chemical features, <i>in vitro</i> biological data with targeted <i>in vivo</i> biological activity.  It was designed and developed by the <a href="http://zhu.camden.rutgers.edu/">Zhu Research Group</a> at Rutgers University in Camden, NJ.<br>
+		<br>
+		<center>
+		<h3>How does CIIPro work?<br></h3>
+		</center>
+		<br>
+		CIIPro will use target compounds to automatically extract relevant public bioassay data, construct their biological profiles, and calculate biological similarity between every two compounds.  Currently the resulting <i>biological profiles</i> consist of biological assay data from PubChem only.  Using CIIPro, the target compounds can be grouped based on their public bioassay testing results and compared to the target biological activity. 
+		<br>
+<br>
+		A more detailed tutorial can be found in the <a href="/tutorial">tutorial</a> section, with input and output file examples.  We are always looking for feedback on the improvement of the web portal.  Please forward any feedback to <a href="mailto:danrusso@scarletmail.rutgers.edu?Subject=CIIPRO">danrusso@scarletmail.rutgers.edu</a>.</p>
+
+	</div>	
+{% endblock %}		

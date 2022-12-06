@@ -1,0 +1,102 @@
+{% extends "template.html" %}
+{% block content %}
+<div name= "p1" style="margin-left: 5px; margin-right: 5px; margin-bottom: 20px">
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{ error }}
+		{% endif %}	
+    <div class="container-fluid" style="height: 100%">
+
+
+<div class="col-lg-12" style="width: 100%">
+        <div class="row">
+
+            <div class="col-lg-1" style="width: 30%; background-color: #E0E0E0; border: 1px solid black;">
+                <p>
+
+             <form action="/activitycliffs" method="post" enctype="multipart/form-data">
+	     {% if datasets %}  
+		Avaialable datasets for <b>{{ username }}</b>:<br>
+		<div class="row">
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+			{% for dataset in datasets %}
+                          {% if datasets.index(dataset) == 0 %}  
+				<input type="radio" name="compound_filename" value="{{ dataset }}" checked="checked"> {{ dataset }}
+				</input><br>
+                          {% else %}
+				<input type="radio" name="compound_filename" value="{{ dataset }}"> {{ dataset }}
+				</input><br>
+                          {% endif %}
+			{% endfor %}
+			</div>
+	        </div>
+	     {% endif %}
+
+
+	     {% if not datasets %}  
+		No datasets available for <b>{{ username }}</b>:<br>
+		<div class="row">
+
+			Please upload a dataset to be profiled.
+	        </div>
+	     {% endif %}
+
+
+
+
+<br>
+	
+        	<b>Find Activity Cliffs.</b> Identifiy Activity Cliffs in datasets
+		<div class="row">
+
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+				
+                This tool will identify the largest gaps in activity for each
+                target and their chemical nearest neighbor. 
+
+			</div>
+
+		</div>
+<br>
+
+
+                        <input type="submit" value ="Identify" name="user_input"/>	
+                </div>
+	        </form>
+
+	  </div>
+
+	</p>
+
+
+		</div>
+
+
+
+     {% if ac %}  
+
+            <div class="row" > 
+
+                <a href="/sendactcliff">Click Here to download data table</a>
+                <div class="col-md" style="width: 75%">
+            	       {{ ac|safe }}
+                </div>
+            </div>
+
+    {% endif %}
+
+<!-- <div class="col-md-1" style="width: 50%;"> -->
+
+		<div class="row" style="width: 75%">
+ 
+               </div>
+
+                    
+<!-- </div> -->
+  
+</div>
+
+ </div>
+</div>         
+</div>
+{% endblock %}
+

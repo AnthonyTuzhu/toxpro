@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="jumbo">
+		<h2>Welcome to CIIPRO username recovery</h2>
+		<br/>
+		<p>
+		An email has been sent to that address.
+		</p>
+		
+	</div>	
+{% endblock %}		

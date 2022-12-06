@@ -1,0 +1,194 @@
+{% extends "template.html" %}
+{% block content %}
+<div name= "p1" style="margin-left: 5px; margin-right: 5px; margin-bottom: 20px">
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{ error }}
+		{% endif %}	
+    <div class="container-fluid" style="height: 100%">
+        <div class="row">
+
+            <div class="col-lg-1" style="width: 40%; background-color: #E0E0E0; border: 1px solid black;">
+                <p>
+                <form action="/ciippredict" method="post" enctype="multipart/form-data">
+
+                <b>Step 1.</b> Select Profile.
+                 <div class="row" >
+ 
+			<div class="col-sm-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+
+			{% if profiles %}
+  				{% for profile in profiles %}
+                                  {% if profiles.index(profile) == 0 %}  
+        				<input type="radio" name="profile_filename" value="{{ profile }}" checked="checked"> {{ profile }}
+        				</input><br>
+                                  {% else %}
+        				<input type="radio" name="profile_filename" value="{{ profile }}"> {{ profile }}
+        				</input><br>
+                                  {% endif %}  
+				{%  endfor %}
+			{% endif  %}
+
+			{% if not profiles %}
+                        Please profile a dataset.
+			{% endif  %}
+			</div>
+
+                  </div>
+	<br>
+
+
+
+	
+        	<b>Step 3.</b> Set Biological Profiling Parameters
+		<div class="row">
+
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				Minimum biological similarity for nearest neighbor calculation: <br>
+				<br>
+                		<b>Note:</b> Please enter number as a floating number (i.e. 0.7) <br>
+                		<input type='text' name="cutoff"/> <br>
+			</div>
+
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+                		Please enter a confidence cutoff: <br>
+				<br>
+				<br>
+                		<b>Note:</b> Please enter number as an integer (i.e. 5) <br>
+                		<input type='text' name="conf"/> <br>				
+			</div>
+		</div>
+	<br>
+
+
+        	<b>Step 4.</b> Prediction parameters (Activity file required)<br>
+			                    <b>Activity file?</b> 
+                    <input type="radio" name="activity_boolean" value="Yes"> Yes</input>
+                    <input type="radio" name="activity_boolean" value="No" checked="checked"> No</input><br> 
+                    <b>Note:</b> Activity file compounds must match compounds in profile. 
+		<div class="row">
+
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Upload Activity file here:</b><br>
+					<br>
+					<br>
+					<input type="file" name="activity_file"/>
+						<input type="radio" name="act_delimit" value="act_tab" checked="checked"> TSV (Tab delimted)
+						</input><br> 
+			</div>
+				
+			<div class="col-sm-2" style="width: 50%; background-color: LightGray; border: 1px solid blue;">
+				<b>Number of nearest neighbors to be used for predictions:</b> <br>
+                		<b>Note:</b> Please enter number as an integer number (i.e. 5) <br>
+                		<input type='text' name="nearest_neighs"/> <br>
+			</div>
+
+		</div>
+	<br>
+	
+
+
+         	<b>Step 5.</b> Choose how to sort in-vitro, in-vivo correlations.
+		<div class="row">
+			
+			<div class="col-sm-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+			<b>Sort By:</b><br>
+				<input type="radio" name="sort_by" value="AID"> AID
+				</input><br>
+				<input type="radio" name="sort_by" value="SENS" checked="checked"> Sensitivity
+				</input><br>
+				<input type="radio" name="sort_by" value="SPEC"> Specificity
+				</input><br>
+				<input type="radio" name="sort_by" value="CCR"> CCR
+				</input><br>
+				<input type="radio" name="sort_by" value="L"> L-Parameter
+				</input><br>
+			</div> 	
+			
+		</div>
+
+
+
+
+        	<b>Step 6.</b> Choose output format and submit
+		<div class="row">
+			
+			<div class="col-sm-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+			<b>Choose output format:</b><br>
+				<br>
+				<input type="radio" name="output_delimit" value="output_tab" checked="checked"> TSV (Tab delimted)
+				</input><br>
+			<input type="submit" value = "Submit" name="user_input"/>
+			</div> 	
+			
+		</div>
+        </div>
+	</form>
+	</p>
+{% if go %}
+            <div class="col-lg-1" style="width: 60%;">                
+             <div class="col-lg-2" style="width: 50%;">
+
+                        <table style="width: 100%; border: 1px solid blue;">
+                        {% if aid  %}
+				<tr style="background-color: #E0E0E0; border: 1px solid black;">
+			        <caption style="text-align:center; background-color: #E0E0E0; border: 1px solid black;"><a href="/sendmatrixstats">In vitro-in vivo Correlation</a><br>
+				(Click title to download)
+				</caption>	
+				</tr>
+
+				<tr style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+                                <th style="width: 20%; background-color: LightGray; border: 1px solid blue;"><b>AID</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>Sensitivity</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>Specificity</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>CCR</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>L-Parameter</b></th>
+				</tr>
+
+                            {% for i in range(0, len_aid) %}			   
+				<tr style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+                                <td style="width: 20%; background-color: LightGray; border: 1px solid blue;"><a href="https://pubchem.ncbi.nlm.nih.gov/assay/assay.cgi?aid={{ each }}" target="_blank">{{ aid[i] }}</a></td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ sens[i] }}</td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ spec[i] }}</td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ ccr[i] }}</td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ l[i] }}</td>
+				</tr>
+                            {% endfor %}
+                        {% endif %}
+                        </table>
+		</div>
+             <div class="col-lg-2" style="width: 50%;">
+
+			{% if cid %}
+                        <table style="width: 100%; border: 1px solid blue;">
+				<tr style="background-color: #E0E0E0; border: 1px solid black;">
+                       		<caption style="text-align:center; background-color: #E0E0E0; border: 1px solid black;"><a href="/dlpredictionfiles">CIIP Predictor</a><br>
+				(Click title to download)
+				</caption>
+				</tr>
+				
+				<tr style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+                                <th style="width: 20%; background-color: LightGray; border: 1px solid blue;"><b>CID</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>Experimental</b></th>
+                                <th style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;"><b>Activity</b></th>
+				</tr>
+
+                            {% for i in range(0, len_cid) %}			   
+				<tr style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+                                <td style="width: 20%; background-color: LightGray; border: 1px solid blue;">{{ cid[i] }}</td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ act[i] }}</td>
+                                <td style="text-align:center; width: 20%; background-color: LightGray; border: 1px solid blue;">{{ pred[i] }}</td>
+			    {% endfor %}
+			</table>
+			{% endif %}
+		</div>
+
+
+              </div>
+            
+  
+  
+    {% endif %}
+ </div>
+</div>         
+</div>
+{% endblock %}

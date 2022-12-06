@@ -1,0 +1,14 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="jumbo">
+	<br>
+	<img src="static/img/group.jpg" style="width354ox;height:278px"<br>
+	<br>
+	<br>
+	<br>
+		 CIIPRO is hosted by the <a href="http://zhu.camden.rutgers.edu/">Zhu Research Group</a> at Rutgers University in Camden, NJ and is proudly affiliated with the Rutgers Camden <a href="http://ccib.camden.rutgers.edu/">Center for Computational and Integrative Biology</a><br>
+		 <br>
+		 All queries should be mailed to <a href="mailto:danrusso@scarletmail.rutgers.edu?Subject=CIIPRO">danrusso@scarletmail.rutgers.edu</a><br>
+		 <br>
+	</div>	
+{% endblock %}		

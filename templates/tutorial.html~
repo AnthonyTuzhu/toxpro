@@ -1,0 +1,148 @@
+{% extends "template.html" %}
+{% block content %}
+<div style="margin-left: 100px; margin-right: 100px;">
+
+
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+
+
+	<h2 style="color:#00008B;">Tutorial</h2>
+	<br>
+	<p style="color:#00008B;" >
+	The tutorial introduces CIIPro in two parts:
+	</p>
+	<br>
+	<left>
+		<ol style="color: #7EB6FF;"><b style="color:#00008B;">I.</b> <a href="#BioPro">CIIProfiler</a></ol>
+		<ol style="color: #7EB6FF;"><b style="color:#00008B;">II.</b> <a href="#BioPred">CIIP Predictor</a></ol>
+	</left>
+	<br>
+	<p style="color:#00008B;">
+	Please forward feedback to <a href="mailto:danrusso@scarletmail.rutgers.edu?Subject=CIIPRO">danrusso@scarletmail.rutgers.edu</a>.
+        </p>
+	<br>
+	<br>
+        <!--
+	<center>
+	<img src="static/img/CIIPRO_workflow.jpg" style="width554ox;height:478px"<br>
+	<p style="color: #00008B;">
+	<b style="color: #00008B;">Figure 1.</b> Schematic workflow describing the four parts of CIIPro.<br>
+	</p>
+        -->
+	</center>
+	<p style="text-indent: 5em; color:#00008B;">
+	Before using CIIPro, users should upload a compound dataset to work with.  This can be done under the <a href="/datasets">Datasets</a> tab.  
+        Compounds can be uploaded in a variety of formats and will automatically be converted to their PubChem CID, if available, and the dataset will be stored and made available to the user.  
+    <b>Please note:</b> compounds needing to be converted to PubChem CIDs are done so by PubChem's <a href="https://pubchem.ncbi.nlm.nih.gov/pug_rest/PUG_REST.html">Power User Gateway</a> and may take a significant
+     amount of time for large datasets.  Under this tab, users must elect to label a dataset as either training set or a test set .  Training sets are used for biological profiling and can be used
+to predict the biological activity of test sets.  Both training sets and test sets should be uploaded in the same format, a tab-delimited text file containing two columns.  The first column should be the chemical identifier
+(e.g., PubChem CIDs, CAS Registery Number, IUPAC name, etc.) and the second should contain the activity classification (i.e, 1 for active, 0 for inactive).   
+	</p>
+	<left>
+	<a name="BioPro" href="/CIIProfiler"><h3 style="color:#00008B;"><b>I.</b> CIIProfiler</h3></a>
+	<br>
+	</left>
+
+
+
+	<p style="text-indent: 5em; color:#00008B;">
+	After uploading a dataset, a <i>biological profile</i> can be made under the <a href="/CIIProfiler">CIIProfiler</a> tab.  The <i>biological profile</i> is created by extracting all the relevent biological testing results for compounds
+in the training set.  This <i>biological profile</i> can be optimized by requiring a minimum number of active responses per assay (default minimum number of actives per assay is set at 6).  This workflow of the CIIProfiler can be
+seen in <b>Figure 1</b>.  The <i>biological profile</i> will be a matrix consisiting of <i>m</i> rows of compounds and <i>n</i> columns of assays and will automatically be displayed as a heatmap.  In the matrix, cell a<i><sub>i,j</sub></i> will be the response of the compound in the <i>i</i>-th row against the assay in the <i>j</i>-th column.  
+The response for a compound can be categorized as <b>1</b> for active (dark blue), <b>0</b> for inconclusive or untested (grey), and <b>-1</b> for inactive (light blue).  The activity of a given cell will be displayed by hovering over it with the mouse.  Additionally, the size of the heatmap can be changed by clicking and expanding/collapsing it in the 
+desired dimension.  Users also have the option to download the heatmap by clicking the save icon in the upper right-hand corner.  The CIIProfiler will also calculate the performance of each <i>in vitro</i> assay for predicting the <i>in vivo</i> responses.  A table displaying the performance statistics for each assay will be displayed along with the heatmap.  Assays can be ranked by a given statistic
+by clicking the column header.  Click <a href="/statsglossary" target="_blank">here</a> for a glossary of the statistical metrics calculated by CIIPro. <br>
+
+	<br>
+	<center>
+	<img src="static/img/Biologicalprofile.jpg" style="width554ox;height:478px"><img src="static/img/CIIProfiler.jpg" style="width554ox;height:478px"<br>
+	<p style="color:#00008B;">
+	<b>Figure 1.</b> The CIIProfiler tool will remove insignificant assays by allowing the user to adjust the minimum number of actives required per assay; this creates a less biased, optimized biological profile.<br>
+	<br>
+	</center>
+
+	<left>
+	<a name="BioPred" href="/CIIPPredictor"><h3 style="color: #00008B;"><b>II.</b> CIIP Predictor</h3></a>
+	</left>
+
+	<br>
+	<p style="text-indent: 5em; color:#00008B;">
+	After a <i>biological profile</i> for the training set compounds has been created, users can calculate the Weighted Estimated Biological Similarity (WEBS) between the compounds in the test set and the compounds in the training set.  
+The WEBS tool calculates two values for each compound pair, the <i>biological similarity</i> and its respective <i>confidence score</i>.  The <i>biological similarity</i> is a value ranged between 0 and 1, which estimates the likeness of two compounds 
+based upon their respective <i>in vitro</i> responses.  A similarity score of 1.0 would be considered identical compounds and a score of 0.0 will be considered as totally dissimilar compounds.  Due to missing data issues, each <i>biological similarity</i> value 
+is assigned a <i>confidence score</i> estimating the reliability of the calcluated <i>biological similarity</i>.  A higher <i>confidence score</i> indicates a more reliable <i>biological similarity</i> value.  The output files for both <i>biological similarity</i>
+ and <i>confidence scores</i> will be matrices, where rows represent compounds in the test set and columns are compounds in the training set.  Cell a<i><sub>i,j</sub></i> in the <i>biological similarity</i> matrix would be the similarity score of the two compounds in the 
+<i>i</i>-th row and in the <i>j</i>-th column.  The same cell in the <i>confidence scores</i> matrix will be the reliability (or <i>confidence score</i>) of the <i>biological similarity</i> calculated for those two compounds.  
+<!--Click <a href="/viewbioconf">here</a> to view a sample file of the <i>biological similarity</i> and the <i>confidence score</i> calculation result.-->
+	</p>
+
+
+	<p style="text-indent: 5em; color:#00008B;">
+	Based on the generated <i>biological similarity</i> and <i>confidence scores</i> calculated by the WEBS tool, the <i>biological nearest neighbors</i> can be calculated by using suitable parameter cutoffs for both the <i>biological similarity</i> and the 
+<i>confidence scores</i>.  The <i>biological similarity</i> cutoff is the minimum <i>biological similarity</i> score for a compound to be considered as the nearest neighbor to the target compound.  This value needs to be a floating point number between 0.0 and 1.0.  
+The default value is 0.5.  Similarily, a <i>confidence score</i> cutoff needs to be entered.  This cutoff is expressed as the percentage of assays in the <i>biological profile</i> that both compounds need to have responses in for a  <i>biological similarity</i> calculation to be
+ meaningful.  Generally, the CIIP Predictor performs best on most datasets with a confidence value of 0%, however, this value can be adjusted as needed for different purposes.
+	</p>
+
+	<p style="text-indent: 5em; color:#00008B;">
+	Lastly, the number of <i>biological nearest neighbors</i>, a value 1-5, used for predictions needs to be selected.  The activities of each test compounds' biological nearest neighbors' will be averaged together to predict the target activity.  Compounds that do not
+have enough <i>biological nearest neighbors</i> to make a prediction will be labelled as 'N/A'.  Compounds in the test set will be displayed in a table with the compounds' <i>in vivo</i> activitiy, as well as the activity predicted by CIIPro.  The workflow of the CIIP
+predictor can be visualized in <b>Figure 2</b>.
+        </p>
+
+        <p style="text-indent: 5em; color:#00008B;">
+        The CIIP Predictor also allows for the visualization of the <i>biological nearest neighbors</i> and the <i>chemical nearest neighbors</i> of the predicted compounds.  CIIPro can present the nearest neighbors as a radial plot as described by a recent publication<sup>1</sup>.  
+For each target compound, chemical nearest neighbors are calculated by using MACCS keys as features and the Tanimoto coefficient as a the similarity metic.  Compounds with a prediction can have their biological and chemical nearest neighbor activity assessed by clicking on the compound PubChem CID.  
+This opens up a similarity graph, where biological nearest nieghbors are on the left and chemical 
+nearest neighbors on the right of the target compound.  An example of this graph is in <b>Figure 3</b>. 
+	</p>
+
+
+<br>
+
+	<center>
+	<img src="static/img/Ciipropredictor.jpg" style="width554ox;height:478px"><img src="static/img/CIIPPredictor.jpg" style="width554ox;height:478px"><br>
+	<br>
+	<p style="color:#00008B;">
+	<b>Figure 2.</b> Under the CIIP Predictor tab, users can create bioloigcal similarities, confidence scores, and biological nearest neighbors.  With activity data, users can generate <i>in vitro - in vivo</i> correlations generate predictions for compounds, and cross validate their model.<br>
+	</p>
+	<br>
+	<img src="static/img/Biosim.png" style=width550ox;height:550px"><br>
+	<br>
+	<p style="color:#00008B;">
+	<b>Figure 3.</b> An example of a similarity graph; Nearest neighbors are displayed as nodes with color representing activity and edges are similarity values.  Target compound
+        is at the origin with color determined by predicted activity by biological nearest neighbors (left half) and chemical nearest neighbors (right half) <br>
+	</p>
+	<br>
+	</center>
+	<br>
+	</p> 
+	<br>
+	<br>
+	<br>
+	<br>
+<p style="color:#00008B;">
+    <b><u>References</b></u><br>
+     1. Low, Y. <i>et al.</i> Integrative Chemical-Biological Read-Across Approach for Chemical Hazard Classification. <i>Chem. Res. Toxicol.</i> <b>26,</b> 1199-1208 (2013).
+</p>
+	<br>
+</div>
+{% endblock %}		

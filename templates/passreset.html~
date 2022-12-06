@@ -1,0 +1,33 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="jumbo" style="margin-left: 100px; margin-right: 100px;">
+		<h2>Welcome to CIIPRO Password Reset</h2>
+		<br/>
+		
+		<h3>Please fill out the following fields:</h3>
+		</p>
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{ error }}
+		{% endif %}		
+		<form action="" method="post">
+			<input type="text" placeholder="Username" name="username" value="{{
+			request.form.username }}" required><br>
+			<br>
+			<input type="password" placeholder="Temporary Password" name="temp_password"value="{{
+			request.form.temp_password }}" required><br>
+			<br>
+			<input type="password" placeholder="New Password" name="new_password"value="{{
+			request.form.temp_password }}" required><br>
+			<br>
+			<input type="password" placeholder="Confirm Password" name="conf_password"value="{{
+			request.form.temp_password }}" required><br>
+			<br>
+			<input class="btn btn-default" type="submit" value="passreset">
+			<br>
+		</form>
+		<br>
+		<br>
+		Forgot Username? click <a href="/usernamerecovery">here</a><br>
+		
+	</div>	
+{% endblock %}		

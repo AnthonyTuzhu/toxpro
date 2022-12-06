@@ -1,0 +1,25 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="jumbo">
+	<h2>Welcome to CIIPRO Registration</h2>
+		<br/>
+		<p>
+		Please fill out the following form to register. 
+		<h3>Please fill out all fields:</h3>
+		</p>
+		<form action="" method="post">
+			<input type="text" placeholder="Username" name="username" value="{{
+			request.form.username }}" required><br>
+			<br>
+			<input type="password" placeholder="Password" name="password" value="{{
+			request.form.password }}" required><br>
+			<br>
+			<input type="text" placeholder="Email" name="email" value="{{
+			request.form.email }}" required><br>
+			<br>
+			<div class="g-recaptcha" data-sitekey="6LdLrAITAAAAAE65drNCSsyQhNVYPuhwl6QGSgyW"></div>
+			<br>
+			<input class="btn btn-default" type="submit" value="Login">
+			<br>
+		</form>
+{% endblock %}		

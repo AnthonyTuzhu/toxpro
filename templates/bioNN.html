@@ -1,0 +1,23 @@
+{% extends "template.html" %}
+{% block content %}
+<head>
+  <meta charset="utf-8">
+  <title>Chemical In Vitro/In Vivo Profiling</title>
+  <body>
+  <div id="page-wrapper">
+      <h1>Biological Nearest Neighbor</h1>
+          <form action="/doNN" method="post" enctype="multipart/form-data">
+                Please enter a confidence cutoff: <br>
+                Note: Please enter number as a floating number (i.e. 0.7) <br>
+                <input type='text' name="conf"/> <br>
+                <br>
+                Please enter a similarity cutoff: <br>
+                Note: Please enter number as a floating number (i.e. 1.0) <br>
+                <input type= 'text' name="cutoff"/> <br>
+                <br>
+                Click here to submit and download: <br>
+                <input type="submit" value = "Bio NN" name="BioNN"/>
+          </form>
+ </body>
+</html>
+{% endblock %}		

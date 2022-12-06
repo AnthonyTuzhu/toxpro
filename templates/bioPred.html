@@ -1,0 +1,29 @@
+{% extends "template.html" %}
+{% block content %}
+<head>
+  <meta charset="utf-8">
+  <title>Chemical In Vitro/In Vivo Profiling</title>
+  <body>
+  <div id="page-wrapper">
+    <h1>Biological Predictor</h1>
+        <form action="/doBioPred" method="post" enctype="multipart/form-data">
+                Please upload Activity file <br>
+                    <input type="file" name="actfile" /> <br>
+                    <br>
+                Please enter a number of nearest neighbors to consider:<br>
+                Note: Please enter as a positive integer (i.e. 5) <br>
+                    <input type="text" name="nn"> <br>
+                    <br>
+                Click here to predict: <br>
+                    <input type="submit" value="Pred" name="Predict"/> <br>
+        </form>
+        <form action="/dlpred" method="post" enctype="multipart/form-data">
+                Click here to download: <br>
+                    <input type="submit" value="DL Pred" name="DLPred"/>
+        {% if activity %}
+        <li>{{ activity }}</li>
+        {% endif %}
+  </div>
+ </body>
+</html>
+{% endblock %}		

@@ -1,0 +1,85 @@
+{% extends "template.html" %}
+{% block content %}
+<div name= "p1" style="margin-left: 5px; margin-right: 5px; margin-bottom: 20px">
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{ error }}
+		{% endif %}	
+    <div class="container-fluid" style="height: 100%">
+
+
+
+        <div class="row">
+
+            <div class="col-lg-2" style="width: 40%; background-color: #E0E0E0; border: 1px solid black;">
+                <p>
+
+             <form action="/ciiprofile" method="post" enctype="multipart/form-data">
+	     {% if datasets %}  
+		Avaialable datasets for <b>{{ username }}</b>:<br>
+		<div class="row">
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+			{% for dataset in datasets %}
+				<input type="radio" name="compound_filename" value="{{ dataset }}"> {{ dataset }}
+				</input><br>
+			{% endfor %}
+			</div>
+	        </div>
+	     {% endif %}
+
+
+	     {% if not datasets %}  
+		No datasets available for <b>{{ username }}</b>:<br>
+		<div class="row">
+
+			Please upload a dataset to be profiled.
+	        </div>
+	     {% endif %}
+
+
+
+
+<br>
+	
+        	<b>Step 1.</b> Set Biological Profiling Parameters
+		<div class="row">
+
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+				Select number of actives to be considered for each bioassay:<br>
+				<br>
+				<b>Note:</b> Please enter number as an integer (i.e. 5) <br>
+				<input type="text" name="noOfActives"/> <br>
+			</div>
+
+		</div>
+<br>
+
+
+        	<b>Step 2.</b> Set Profile Name
+		<div class="row">
+
+			<div class="col-md-1" style="width: 100%; background-color: LightGray; border: 1px solid blue;">
+				Please enter a name for this profile:<br>
+				<br>
+				<input type="text" name="profile_filename"/> <br>
+				<br>
+				<input type="submit" value = "Profile" name="user_input"/>
+			</div>
+	        </form>
+		</div>
+	  </div>
+
+	</p>
+
+     {% if hp %}     
+        <div class="col-lg-2" style="width: 60%">
+            <div class="row" > 
+                <div class="col-md-1" style="width: 100%">
+            	       {{ hp|safe }}
+                </div>
+            </div>
+    {% endif %}
+
+ </div>
+</div>         
+</div>
+{% endblock %}
