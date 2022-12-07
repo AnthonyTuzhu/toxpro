@@ -17,48 +17,32 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sql import passwordRetrieval, usernameRetrieval, passwordReset
-from CIIProTools import *
-from ciipro_config import CIIProConfig
+
 import json, glob
-from BioSimLib import *
+
 #import urllib
 import zipfile
 
 import sqlalchemy.ext
 
-from datasets_io import write_ds_to_json
+
 import pandas as pd
 import numpy as np
 
-import ciipro_io
-
-import datasets_io as ds_io
-import datasets as ds
-
-import bioprofiles as bp
-import biosimilarity as biosim
-
-import fpprofiles as fp
-
-from cluster import in_vitro_fingerprint_correlations
 
 from ml import get_class_stats
 
-from api.database_api import api
 
-import inhouse_databases
 
 # These variables are configured in CIIProConfig
 # TODO: put all this in a true config file
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = CIIProConfig.UPLOAD_FOLDER
+#app.config['UPLOAD_FOLDER'] = CIIProConfig.UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.secret_key = CIIProConfig.APP_SECRET_KEY
-app.config['RECAPTCHA_PRIVATE_KEY'] = CIIProConfig.RECAPTCHA_PRIVATE_KEY
+app.secret_key = 'test'
+app.config['RECAPTCHA_PRIVATE_KEY'] = 'test'
 
 # register the routes api
-
-app.register_blueprint(api)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -154,7 +138,7 @@ class User(db.Model):
 
 
     
-db.create_all()
+#db.create_all()
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))

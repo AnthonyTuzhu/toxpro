@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 import smtplib
 import string
 import random
-from ciipro_config import CIIProConfig
+
 
 def passwordGenerator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
