@@ -10,6 +10,7 @@ import json, os
 # from app.db import get_db
 
 from app.toxpro_db import DB as toxprodb
+from flask_login import current_user, login_required
 
 bp = Blueprint('toxpro', __name__)
 
@@ -32,6 +33,7 @@ def index():
 
 
 @bp.route('/upload', methods=['GET'])
+@login_required
 def upload():
     """
     displays the homepage
@@ -42,6 +44,7 @@ def upload():
 
 
 @bp.route('/curator', methods=['GET'])
+@login_required
 def curator():
     """
     displays the homepage
@@ -52,6 +55,7 @@ def curator():
 
 
 @bp.route('/profile', methods=['GET'])
+@login_required
 def profile():
     """
     displays the homepage
@@ -62,6 +66,7 @@ def profile():
 
 
 @bp.route('/toxdata', methods=['GET'])
+@login_required
 def toxdata():
     """
     displays the homepage

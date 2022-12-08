@@ -9,9 +9,11 @@ from datetime import timezone
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
+from flask_login import login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.db import get_db
+#from app.db import get_db
+from app.db_models import User, db
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -29,7 +31,6 @@ def register():
     email = request.form['email'].strip()
     error = None
 
-    db = get_db()
     if not username:
         error = 'Username is required.'
     elif not password:
@@ -54,25 +55,18 @@ def register():
     if error is None:
         try:
             dt = datetime.datetime.now(timezone.utc)
+            u = User(username=username,
+                     password_hash=generate_password_hash(password),
+                     email=email,
+                     last_login=dt,
+                     user_created=dt)
 
-            insert_values = (username,
-                             generate_password_hash(password),
-                             email,
-                             dt,
-                             dt)
-            db.execute(
-                "INSERT INTO user (username, password, email, created_date, last_login) VALUES (?, ?, ?, ?, ?)",
-                insert_values,
-            )
-            db.commit()
+            db.session.add(u)
+            db.session.commit()
         except db.IntegrityError:
-            user = db.execute(
-                'SELECT * FROM user WHERE username = ?', (username,)
-            ).fetchone()
+            user = User.query.filter_by(username=username).first()
 
-            email_result = db.execute(
-                'SELECT * FROM user WHERE email = ?', (email,)
-            ).fetchone()
+            email_result = User.query.filter_by(email=email).first()
 
             if user:
                 error = f"User {username} is already registered."
@@ -93,61 +87,61 @@ def register():
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        db = get_db()
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE username = ?', (username,)
-        ).fetchone()
+        user = User.query.filter_by(username=username).first()
 
         if user is None:
             error = 'Incorrect username.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user.password_hash, password):
             error = 'Incorrect password.'
 
 
         if error is None:
-            session.clear()
-            session['user_id'] = user['id']
-            dt = datetime.datetime.now(timezone.utc)
-            sql = ''' UPDATE user 
-                      SET last_login = ? 
-                      WHERE id = ? '''
-            db.execute(sql, (dt, user['id']))
-            db.commit()
+            #  login
+            login_user(user)
+            db.session.query(User). \
+                filter(User.username == user.username). \
+                update({'last_login': datetime.datetime.now(timezone.utc)})
+            db.session.commit()
+
+            # update login
             return redirect(url_for('index'))
 
-        flash(error)
+        flash(error, 'danger')
 
     return render_template('auth/login.html')
 
-@bp.before_app_request
-def load_logged_in_user():
-    user_id = session.get('user_id')
-
-    if user_id is None:
-        g.user = None
-    else:
-        g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
-        ).fetchone()
-
 @bp.route('/logout')
+@login_required
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for('index'))
 
 
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('auth.login'))
+# @bp.before_app_request
+# def load_logged_in_user():
+#     user_id = session.get('user_id')
+#
+#     if user_id is None:
+#         g.user = None
+#     else:
+#         g.user = get_db().execute(
+#             'SELECT * FROM user WHERE id = ?', (user_id,)
+#         ).fetchone()
+#
 
-        return view(**kwargs)
-
-    return wrapped_view
+#
+# def login_required(view):
+#     @functools.wraps(view)
+#     def wrapped_view(**kwargs):
+#         if g.user is None:
+#             return redirect(url_for('auth.login'))
+#
+#         return view(**kwargs)
+#
+#     return wrapped_view
 
 
 class PasswordCheck:

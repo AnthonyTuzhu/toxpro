@@ -27,3 +27,7 @@ https://stackoverflow.com/questions/11680815/removing-windows-newlines-on-linux-
 helpful notes:
 
 SQLALCHEMY and app factories:https://flask.palletsprojects.com/en/2.2.x/patterns/appfactories/
+
+started using flask migrations: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
+
+flask db init to intializaize db

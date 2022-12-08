@@ -1,13 +1,14 @@
 import os
 
 from flask import Flask
-
+from flask_login import LoginManager
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.instance_path, 'toxpro.sqlite'),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False
     )
 
     if test_config is None:
@@ -24,8 +25,16 @@ def create_app(test_config=None):
         pass
 
     # add the db: https://flask.palletsprojects.com/en/2.0.x/tutorial/database/
-    from .db_models import db
+    from .db_models import db, User, migrate
     db.init_app(app)
+    migrate.init_app(app, db)
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     # register blueprint:  https://flask.palletsprojects.com/en/2.0.x/tutorial/views/
     from . import auth
@@ -42,3 +51,10 @@ def create_app(test_config=None):
         return 'Hello, World!'
 
     return app
+
+
+# # needed for flask-migate
+# application = create_app()
+#
+# if __name__ == '__main__':
+#     application.run()

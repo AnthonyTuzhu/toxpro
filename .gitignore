@@ -31,6 +31,7 @@ notes.txt
 resources/
 data/
 logs/
+instance/
 
 Dockerfile
 

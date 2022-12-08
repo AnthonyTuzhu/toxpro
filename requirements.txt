@@ -5,3 +5,5 @@ pip==22.3.1
 plotly==5.9.0
 rdkit==2022.09.2
 flask-sqlalchemy==2.5.1
+flask-login==0.6.2
+flask-migrate==4.0.0
