@@ -1,0 +1,39 @@
+# Created by .ignore support plugin (hsz.mobi)
+/.idea
+.spyderworkspace
+
+# ignore the config files
+ciipro_config.py
+ciipro_app.wsgi
+
+/__pycache__
+
+# database
+users.db
+
+# uploads folders
+
+/uploads.lustre
+/uploads_local
+
+# vim files 
+*.swp
+
+# .pyc files
+*.pyc
+
+# ignore the notes file that contains 
+# info about the CIIPro app
+notes.txt
+
+.DS_Store
+
+resources/
+data/
+logs/
+
+Dockerfile
+
+run_docker*.sh
+
+api/api_config.py

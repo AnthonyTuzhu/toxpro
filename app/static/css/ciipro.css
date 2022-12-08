@@ -4,7 +4,7 @@ body {
 }
 
 /*.card {*/
-    /*border-color: #05056F;*/
+    /*border-color: #151F30;*/
     /*border-width: 1px;*/
 /*}*/
 
@@ -27,75 +27,75 @@ btm-padding {
 
 
 .panel-primary {
-    color: #05056F;
-    border-color: #05056F;
+    color: #151F30;
+    border-color: #151F30;
     background-color: #F0F0F0;
 }
 
 .panel-primary .panel-heading{
-    background-color: #05056F;
+    background-color: #151F30;
     color: #F0F0F0;
 }
 
 .btn-primary {
-    background-color: #05056F;
+    background-color: #151F30;
     border: none;
 }
 
 .btn-info {
-    background-color: #6FA5FF;
+    background-color: #0593A2;
     border: none;
 }
 
 .btn-info:hover {
-    background-color: #05056F;
+    background-color: #151F30;
     border: none;
 }
 
 .btn-info:active {
-    background-color: #6FA5FF;
+    background-color: #0593A2;
 }
 
 .btn-info:focus {
-    background-color: #6FA5FF;
+    background-color: #0593A2;
 }
 
 .btn-primary:hover {
-    background-color: #6FA5FF;
-    border: #05056F;
+    background-color: #0593A2;
+    border: #151F30;
 }
 
 .btn-primary:active {
     background-color: #F0F0F0;
-    color: #05056F;
+    color: #103778;
     border: none;
 }
 
 .btn-primary:focus {
     background-color: #F0F0F0;
-    color: #05056F;
+    color: #103778;
     border: none;
 }
 
 .navbar-brand {
-    color: #05056F;
+    color: #151F30;
     font-size: 25px;
 }
 
 .navbar {
-    color: #0505FF;
+    color: #0593A2;
     font-size: 20px;
 }
 
 /* for the home page */
 
-.ciipro-overview h3 {
-    color:#05056F;
+.toxpro-overview h3 {
+    color:#151F30;
     text-align: center
 }
 
-.ciipro-overview p {
-    color:#05056F;
+.toxpro-overview p {
+    color:#151F30;
     text-align: center
 }
 
@@ -118,7 +118,7 @@ btm-padding {
 
 /* for flashed messages */
 .alert-info {
-    background-color: #6FA5FF;
+    background-color: #0593A2;
     border: none;
     color: white;
 }
