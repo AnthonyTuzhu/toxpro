@@ -1,0 +1,29 @@
+### BASIC SETUP
+
+Getting started using the Flask tutorial: https://flask.palletsprojects.com/en/2.0.x/tutorial
+
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xix-deployment-on-docker-containers
+
+
+command for pushing image to docker hub
+
+docker tag nanodb:latest danrusso/nanodb:latest
+docker push danrusso/nanodb
+
+
+command for starting docker on digital ocean
+
+need to remove image first to make sure it pulls from repo after update
+
+sudo docker run -p 80:5000 -v /c/Users/russod/Projects/toxpro/logs:/home/toxpro/logs -v /c/Users/russod/Projects/toxpro/data:/home/tox/data/ --env NANO_FILE_DIR=/home/tox/data --name toxpro -d -t toxpro
+
+I was getting a exec ./boot.sh: no such file or directory
+
+
+turns out i was getting removing windows style line endings this solved the problem:
+https://unix.stackexchange.com/questions/79702/how-to-test-whether-a-file-uses-crlf-or-lf-without-modifying-it
+https://stackoverflow.com/questions/11680815/removing-windows-newlines-on-linux-sed-vs-awk
+
+helpful notes:
+
+SQLALCHEMY and app factories:https://flask.palletsprojects.com/en/2.2.x/patterns/appfactories/
