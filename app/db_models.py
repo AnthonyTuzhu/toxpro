@@ -7,14 +7,28 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from flask_migrate import Migrate
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
 from datetime import datetime
+from sqlalchemy import MetaData
 
-db = SQLAlchemy()
+# this is a fix for unique constrains
+# and forien keys in Flask-migrate
+# see SO: https://stackoverflow.com/questions/45527323/flask-sqlalchemy-upgrade-failing-after-updating-models-need-an-explanation-on-h
+
+naming_convention = {
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+}
+db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+
 migrate = Migrate(db)
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -23,6 +37,7 @@ class User(db.Model, UserMixin):
     last_login = db.Column(db.DateTime)
     user_created = db.Column(db.DateTime)
     datasets = db.relationship('Dataset', backref='owner', lazy='dynamic')
+
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
@@ -32,8 +47,9 @@ class User(db.Model, UserMixin):
 
 class Dataset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='user-dataset'))
     dataset_name = db.Column(db.String)
+    chemicals = db.relationship('Chemical', backref='dataset', lazy='dynamic')
 
     created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     __table_args__ = (
@@ -43,10 +59,19 @@ class Dataset(db.Model):
 class Chemical(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     inchi = db.Column(db.String)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id', name='dataset-chemical'))
+    activity = db.Column(db.Integer)
+    compound_id = db.Column(db.String)
 
-# class Chemical(db.Model):
-#     p
 
+def create_db(overwrite=False):
+    """Clear the existing data and create new tables."""
+    from . import create_app
+    import os
+    app = create_app()
+    if overwrite and os.path.exists(os.path.join(app.instance_path, 'toxpro.sqlite')):
+        os.remove(os.path.join(app.instance_path, 'toxpro.sqlite'))
+    db.create_all(app=app)
 
 @click.command('init-db')
 @with_appcontext

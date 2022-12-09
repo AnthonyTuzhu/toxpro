@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datasets.css') }}">
+<script src="../static/js/datasets.js"></script>
+<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+<div id="divLoading">
+
+</div>
+
+<div class="dataset-body">
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+              <div class="card-body">
+                  <form action="{{ url_for('toxpro.uploaddataset') }}" method="post" enctype="multipart/form-data" name="">
+                      <h5 class="card-title">Upload a dataset.</h5>
+                      <p class="card-text">Please select a file to upload a new dataset. Datasets should be in an SDFile.</p>
+
+                      <input type="file" class="form-control-file top-padding btm-padding" name="compound_file" id="compound_file">
+
+                       <label for="cmp-id" class="card-text">Compound ID (has to be a property in the SDFile):</label>
+                        <div class="input-group input-group-sm mb-3">
+                          <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm", name="cmp-id-property">
+                        </div>
+
+
+
+                        <label for="act-id" class="card-text">Activity name (has to be a property in the SDFile):</label>
+                        <div class="input-group input-group-sm mb-3">
+                          <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm", name="act-id-property">
+                        </div>
+
+
+                      <input type="submit" style="color: white;"
+                         class="btn btn-primary btn-padding"
+                         value="Upload dataset" onclick="loading()"></input>
+                  </form>
+              </div>
+            </div>
+          </div>
+
+        <div class="col-sm-6">
+        {% if user_datasets %}
+                <div class="form-group">
+                  <label for="dataset-selection">Select dataset:</label>
+                  <select class="form-control" id="dataset-selection">
+                    {% for dataset in user_datasets %}
+                        <option value="{{ dataset.dataset_name }}"> {{ dataset.dataset_name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+        {% endif %}
+          </div>
+
+    </div>
+
+</div>
+<script>
+
+updateDataset();
+var e = document.getElementById("dataset-selection");
+e.addEventListener("change", function() {
+    updateDataset();
+
+});
+
+
+$('tr').dblclick(function() {
+    var dataset = $(this).children("td:first-child").text();
+    addInhouseDataset(dataset);
+
+});
+
+</script>
+
+{% endblock %}

@@ -27,7 +27,7 @@ def create_app(test_config=None):
     # add the db: https://flask.palletsprojects.com/en/2.0.x/tutorial/database/
     from .db_models import db, User, migrate
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
@@ -40,10 +40,15 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+    from . import cheminf
+    app.register_blueprint(cheminf.bp)
+
     # register main outline: https://flask.palletsprojects.com/en/2.0.x/tutorial/blog/
     from . import toxpro
     app.register_blueprint(toxpro.bp)
     app.add_url_rule('/', endpoint='index')
+
+
 
     # a simple page that says hello
     @app.route('/hello')

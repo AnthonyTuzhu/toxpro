@@ -24,7 +24,7 @@
     <script src="../static/js/requests.js"></script>
     <script src="../static/js/ciipro.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-
+    <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
     <script src="http://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 {#    <script src="http://cdn.datatables.net/1.10.22/js/dataTables.bootstrap.min.js"></script>#}
 </head>
@@ -40,15 +40,15 @@
 
 
             <ul class="list-unstyled components">
-                <p>CIIPro Dashboard</p>
+                <p>ToxPro Dashboard</p>
                 <li class="active">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">ToxPro</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
                         <li>
-                            <a href="/upload">Upload</a>
-                            <a href="/curator">Curator</a>
-                            <a href="/profile">Datasets</a>
-                            <a href="/toxdata">Datasets</a>
+                            <a href={{ url_for('toxpro.datasets') }}>Datasets</a>
+                            <a href={{ url_for('toxpro.curator') }}>Curator</a>
+                            <a href={{ url_for('toxpro.assayProfile') }}>Assay Profiler</a>
+                            <a href={{ url_for('toxpro.toxdata') }}>ToxPro Database</a>
                         </li>
                     </ul>
                 </li>
@@ -57,9 +57,9 @@
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Cheminformatics</a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
                         <li>
-                            <a href="/PCA">Principal Component Analysis</a>
-                            <a href="/QSAR-Builder">QSAR Builder</a>
-                            <a href="/QSAR-Builder">QSAR Predict</a>
+                            <a href={{ url_for('cheminf.PCA') }}>Principal Component Analysis</a>
+                            <a href={{ url_for('cheminf.QSAR_build') }}>QSAR Builder</a>
+                            <a href={{ url_for('cheminf.QSAR_predict') }}>QSAR Predict</a>
                         </li>
                     </ul>
                 </li>
@@ -99,7 +99,7 @@
                             </li>
                             {% if current_user.is_authenticated %}
                                 <li class="nav-item active">
-                                    <a class="nav-link" href="/logout">Logout</a>
+                                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                                 </li>
 					        {% endif %}
 			    	        {% if not current_user.is_authenticated %}

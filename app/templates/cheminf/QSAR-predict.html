@@ -8,9 +8,9 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-
-                  <p class="card-text">We're sorry this function has not yet been implemented.</p>
-
+                  {% if not user_datasets %}
+                  <p class="card-text">Please upload a dataset to be able to perform principal component analysis.</p>
+                  {% endif %}
               </div>
             </div>
           </div>

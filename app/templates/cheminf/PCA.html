@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                  {% if not user_datasets %}
+                  <p class="card-text">Please upload a dataset to be able to perform principal component analysis.</p>
+                  {% endif %}
+
+
+                  {% if user_datasets %}
+                    <form action="{{ url_for('cheminf.PCA') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                      <label for="dataset-selection">Select dataset:</label>
+                      <select class="form-control" name="dataset-selection">
+                        {% for dataset in user_datasets %}
+                            <option value="{{ dataset.dataset_name }}"> {{ dataset.dataset_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <input type="submit" style="color: white;"
+                         class="btn btn-primary btn-padding"
+                         value="Perform PCA" onclick="loading()">
+                    </form>
+                    {% endif %}
+                    {% if pca_plot %}
+                        <div id='chart' class='chart'”></div>
+                    {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <script type='text/javascript'>
+      var graphs = {{pca_plot | safe}};
+      Plotly.plot('chart',graphs, {});
+    </script>
+
+{% endblock %}

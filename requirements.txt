@@ -7,3 +7,4 @@ rdkit==2022.09.2
 flask-sqlalchemy==2.5.1
 flask-login==0.6.2
 flask-migrate==4.0.0
+scikit-learn==1.2.0

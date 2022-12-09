@@ -32,6 +32,7 @@ resources/
 data/
 logs/
 instance/
+instance/toxpro.sqlite
 
 Dockerfile
 
