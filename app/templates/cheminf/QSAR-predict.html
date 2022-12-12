@@ -1,22 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <div>
-
-
         <div class="row">
-          <div class="col-sm-12">
+          <div class="col-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-                  {% if not user_datasets %}
-                  <p class="card-text">Please upload a dataset to be able to perform principal component analysis.</p>
-                  {% endif %}
+
+                  {% if not user_qsar_models %}
+                  <div class="row">
+                        <div class="col-12">
+                            <p>No QSAR models available.  Please use QSAR build to create a QSAR model.</p>
+                        </div>
+                    </div>
+
+
+                  {% else %}
+
+                      <div class="row">
+                        <div>
+
+                        </div>
+                      </div>
+
+                   <form action="{{ url_for('cheminf.QSAR_predict') }}" method="post" enctype="multipart/form-data">
+                   <div class="row">
+
+                        <div class="col-6">
+                          <label for="model-selection">Select QSAR model:</label>
+                          <select class="form-control" name="model-selection">
+                            {% for qsar_model in user_qsar_models %}
+                                <option value="{{ qsar_model.name }}"> {{ qsar_model.name }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label for="predict-file">Select SDFile:</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" name="predict-file">
+                                <button type="submit" class="btn btn-danger">Predict</button>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                    {% endif %}
+
+
               </div>
             </div>
           </div>
         </div>
 
 
-    </div>
+
+
+
 
 {% endblock %}

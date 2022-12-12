@@ -50,8 +50,9 @@ class Dataset(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='user-dataset'))
     dataset_name = db.Column(db.String)
     chemicals = db.relationship('Chemical', backref='dataset', lazy='dynamic')
+    qsar_models = db.relationship('QSARModel', backref='qsarmodel', lazy='dynamic')
 
-    created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
     __table_args__ = (
         db.UniqueConstraint('user_id', 'dataset_name', name='_user_dataset_uc'),
     )
@@ -62,6 +63,17 @@ class Chemical(db.Model):
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id', name='dataset-chemical'))
     activity = db.Column(db.Integer)
     compound_id = db.Column(db.String)
+
+
+class QSARModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='user-dataset'))
+    name = db.Column(db.String)
+    algorithm = db.Column(db.String)
+    descriptors = db.Column(db.String)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id', name='dataset-chemical'))
+    sklearn_model = db.Column(db.BLOB)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 def create_db(overwrite=False):

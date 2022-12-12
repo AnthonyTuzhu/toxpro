@@ -82,6 +82,7 @@ def uploaddataset():
         sdfile.save(user_uploaded_file)
 
         mols_df = PandasTools.LoadSDF(user_uploaded_file)
+        os.remove(user_uploaded_file)
 
         if mols_df.empty:
             error = 'No compounds in SDFile'
