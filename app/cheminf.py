@@ -1,7 +1,6 @@
 # this module is outlined
 # here: https://flask.palletsprojects.com/en/2.0.x/tutorial/views/
-
-
+import flask
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, current_app
 )
@@ -110,16 +109,21 @@ def QSAR_build():
 
 
     # create descriptors
-    X = chem_io.calc_descriptors_from_frame(df)
+    X = chem_io.get_desc(df, desc_selection)
 
     y = df['activity']
     y.index = df['compound_id']
     y = y.loc[X.index]
 
+    if desc_selection == 'RDKit':
+        scale = True
+    else:
+        scale = False
+
     model, cv_preds, train_stats = ml.build_qsar_model(X,
                                                        y,
                                                        alg_selection,
-                                                       scale=True if desc_selection == 'RDKit' else False)
+                                                       scale=scale)
 
 
     name = f'{dataset_selection}-{desc_selection}-{alg_selection}'
@@ -198,7 +202,7 @@ def QSAR_predict():
             qsar_model = QSARModel.query.filter_by(name=model_name).first()
             sklearn_model = pickle.loads(qsar_model.sklearn_model)
 
-            X_predict = chem_io.calc_descriptors_from_frame(mols_df)
+            X_predict = chem_io.get_desc(mols_df, qsar_model.descriptors)
 
             mols_df_trim = mols_df.set_index('compound_id').loc[X_predict.index]
 
@@ -206,6 +210,8 @@ def QSAR_predict():
 
             PandasTools.WriteSDF(mols_df_trim, user_uploaded_file,
                                  properties=mols_df_trim.drop('ROMol', axis=1).columns)
+            return flask.send_file(user_uploaded_file,
+                                   attachment_filename=compound_filename.replace('.sdf', '_predicted.sdf'))
 
 
     if error:

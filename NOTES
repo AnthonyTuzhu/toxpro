@@ -31,3 +31,12 @@ SQLALCHEMY and app factories:https://flask.palletsprojects.com/en/2.2.x/patterns
 started using flask migrations: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database
 
 flask db init to intializaize db
+
+## Redis Queue
+
+Redis Queue is a way to handle background tasks/jobs.  It requires a seperate server and installation outside
+of python.
+
+Docker should be good for this: https://www.docker.com/blog/how-to-use-the-redis-docker-official-image/
+
+Here is a tutorial for using it with flask: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs

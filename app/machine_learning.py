@@ -25,9 +25,9 @@ CLASSIFIER_ALGORITHMS = [
                                                        'kNN__weights': ['uniform', 'distance']}),
     ('SVM', SVC(probability=True,
                 class_weight='balanced',
-                random_state=seed), {'SVM__kernel': ['rbf'],
+                random_state=seed), {'SVM__kernel': ['linear'],
                                      'SVM__gamma': [1e-2, 1e-3],
-                                     'svc__C': [1, 10]}),
+                                     'SVM__C': [1, 10]}),
     ('BNB', BernoulliNB(alpha=1.0), {}),
     ('ADA', AdaBoostClassifier(n_estimators=100, learning_rate=0.9, random_state=seed), {})
 ]
@@ -46,34 +46,34 @@ def build_qsar_model(X: pd.DataFrame, y: pd.Series, alg: str, scale=True):
     else:
         pipe = pipeline.Pipeline([(name, model)])
 
-        grid_search = model_selection.GridSearchCV(pipe,
-                                                   param_grid=params,
-                                                   cv=cv,
-                                                   scoring=class_scoring,
-                                                   refit='AUC')
-        grid_search.fit(X, y)
-        best_estimator = grid_search.best_estimator_
+    grid_search = model_selection.GridSearchCV(pipe,
+                                               param_grid=params,
+                                               cv=cv,
+                                               scoring=class_scoring,
+                                               refit='AUC')
+    grid_search.fit(X, y)
+    best_estimator = grid_search.best_estimator_
 
-        # get the predictions from the best performing model in 5 fold cv
-        cv_predictions = pd.DataFrame(
-            cross_val_predict(best_estimator, X, y,
-                              cv=cv,
-                              method='predict_proba'),
-            index=y.index)
+    # get the predictions from the best performing model in 5 fold cv
+    cv_predictions = pd.DataFrame(
+        cross_val_predict(best_estimator, X, y,
+                          cv=cv,
+                          method='predict_proba'),
+        index=y.index)
 
-        cv_class = cv_predictions[1].copy()
-        cv_class[cv_class >= 0.5] = 1
-        cv_class[cv_class < 0.5] = 0
-        five_fold_stats = get_class_stats(None, y, cv_predictions[1])
+    cv_class = cv_predictions[1].copy()
+    cv_class[cv_class >= 0.5] = 1
+    cv_class[cv_class < 0.5] = 0
+    five_fold_stats = get_class_stats(None, y, cv_predictions[1])
 
-        # record the predictions and the results
-        final_cv_predictions = pd.concat([cv_predictions[1], cv_class], axis=1)
+    # record the predictions and the results
+    final_cv_predictions = pd.concat([cv_predictions[1], cv_class], axis=1)
 
-        binary_model = pickle.dumps(best_estimator)
+    binary_model = pickle.dumps(best_estimator)
 
-        train_stats = get_class_stats(best_estimator, X, y)
+    #train_stats = get_class_stats(best_estimator, X, y)
 
-        return binary_model, final_cv_predictions, train_stats
+    return binary_model, final_cv_predictions, five_fold_stats
 
 if __name__ == '__main__':
     print(CLASSIFIER_ALGORITHMS_DICT)
