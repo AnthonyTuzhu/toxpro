@@ -48,7 +48,7 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def launch_task(self, name, description, *args, **kwargs):
-        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
+        rq_job = current_app.task_queue.enqueue('app.tasks.' + name,
                                                 *args, **kwargs)
         task = Task(id=rq_job.get_id(), name=name, description=description,
                     user=self)
@@ -56,7 +56,7 @@ class User(db.Model, UserMixin):
         return task
 
     def get_tasks_in_progress(self):
-        return Task.query.filter_by(user=self.id, complete=False).all()
+        return Task.query.filter_by(user=self, complete=False).all()
 
     def get_task_in_progress(self, name):
         return Task.query.filter_by(name=name, user=self,
@@ -110,7 +110,7 @@ class Task(db.Model):
 
     def get_progress(self):
         job = self.get_rq_job()
-        return job.meta.get('progress', 0) if job is not None else 100
+        return job.meta.get('progress', 'Queued') if job is not None else 'Finished'
 
 def create_db(overwrite=False):
     """Clear the existing data and create new tables."""

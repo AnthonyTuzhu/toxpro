@@ -83,74 +83,25 @@ def QSAR_build():
     """
 
     if request.method == 'GET':
-        return render_template('cheminf/QSAR-build.html', user_datasets=list(current_user.datasets))
+        return render_template('cheminf/QSAR-build.html', user_datasets=list(current_user.datasets), user=current_user)
 
-    current_user.launch_task('example', 'Counting down', 10)
-    return render_template('cheminf/QSAR-build.html', user_datasets=list(current_user.datasets))
-    # dataset_selection = request.form['dataset-selection'].strip()
-    # desc_selection = request.form['descriptor-selection'].strip()
-    # alg_selection = request.form['algorithm-selection'].strip()
-    #
-    #
-    # query_statement = db.session.query(Chemical).join(Dataset,
-    #                                                    Dataset.id == Chemical.dataset_id) \
-    #                     .filter(Dataset.dataset_name==dataset_selection) \
-    #                     .filter(Dataset.user_id==current_user.id).statement
-    # df = pd.read_sql(query_statement, db.session.bind)
-    #
-    #
-    # dataset = Dataset.query.filter_by(dataset_name=dataset_selection).first()
-    # # erase exists models
-    # qsar_model = QSARModel.query.filter_by(user_id=current_user.id,
-    #                                    algorithm=alg_selection,
-    #                                    descriptors=desc_selection,
-    #                                    dataset_id=dataset.id,).first()
-    #
-    # if qsar_model:
-    #     db.session.delete(qsar_model)
-    #
-    #
-    # # create descriptors
-    # X = chem_io.get_desc(df, desc_selection)
-    #
-    # y = df['activity']
-    # y.index = df['compound_id']
-    # y = y.loc[X.index]
-    #
-    # if desc_selection == 'RDKit':
-    #     scale = True
-    # else:
-    #     scale = False
-    #
-    # model, cv_preds, train_stats = ml.build_qsar_model(X,
-    #                                                    y,
-    #                                                    alg_selection,
-    #                                                    scale=scale)
-    #
-    #
-    # name = f'{dataset_selection}-{desc_selection}-{alg_selection}'
-    #
-    #
-    #
-    # qsar_model = QSARModel(user_id=current_user.id,
-    #                        name=name,
-    #                        algorithm=alg_selection,
-    #                        descriptors=desc_selection,
-    #                        dataset_id=dataset.id,
-    #                        sklearn_model=model)
-    #
-    # db.session.add(qsar_model)
-    # db.session.commit()
-    #
-    # flash(f'Finished QSAR model using {desc_selection} '
-    #       f'descriptors and {alg_selection} on {dataset_selection}.  Model saved as {qsar_model.name}', 'info')
-    #
-    # qsar_results=train_stats
-    # print(qsar_results)
-    # return render_template('cheminf/QSAR-build.html',
-    #                        user_datasets=list(current_user.datasets),
-    #                        qsar_results=qsar_results)
-    #
+    dataset_selection = request.form['dataset-selection'].strip()
+    desc_selection = request.form['descriptor-selection'].strip()
+    alg_selection = request.form['algorithm-selection'].strip()
+
+    name = f'{dataset_selection}-{desc_selection}-{alg_selection}'
+
+    current_user.launch_task('build_qsar',
+                             f'Building QSAR Model on {name}',
+                             current_user.id,
+                             dataset_selection,
+                             desc_selection,
+                             alg_selection
+                             )
+    db.session.commit()
+
+    return redirect(url_for('cheminf.QSAR_build'))
+
 
 @bp.route('/QSAR-predict', methods=('GET', 'POST'))
 @login_required
