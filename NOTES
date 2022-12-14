@@ -40,3 +40,17 @@ of python.
 Docker should be good for this: https://www.docker.com/blog/how-to-use-the-redis-docker-official-image/
 
 Here is a tutorial for using it with flask: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+
+
+There are two commands that need to be run to get the redis server runnign using docker.  The first is to start the redis
+container using:
+
+```
+docker run --name my-redis -p 6379:6379 redis
+```
+
+then in a separate terminal need to start the RQ worker.  This needs to be done with the ToxPro env
+
+```
+rq worker toxpro-tasks
+```

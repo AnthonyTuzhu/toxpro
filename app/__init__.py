@@ -2,12 +2,14 @@ import os
 
 from flask import Flask
 from flask_login import LoginManager
+from redis import Redis
+import rq
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.instance_path, 'toxpro.sqlite'),
+        SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'toxpro.sqlite'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False
     )
 
@@ -48,12 +50,9 @@ def create_app(test_config=None):
     app.register_blueprint(toxpro.bp)
     app.add_url_rule('/', endpoint='index')
 
+    app.redis = Redis.from_url('redis://')
+    app.task_queue = rq.Queue('toxpro-tasks', connection=app.redis)
 
-
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
 
     return app
 
