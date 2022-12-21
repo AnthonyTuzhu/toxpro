@@ -51,9 +51,7 @@ def PCA():
     df = pd.read_sql(query_statement, db.session.bind)
 
 
-    descriptors = chem_io.calc_descriptors_from_frame(df)
-
-    print(df.columns)
+    descriptors = chem_io.calc_descriptors_from_frame(df, scale=True)
 
     pca = pd.DataFrame(skl_PCA(n_components=2).fit_transform(descriptors),
                        columns=['PCA1', 'PCA2'])

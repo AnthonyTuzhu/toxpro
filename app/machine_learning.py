@@ -25,7 +25,7 @@ CLASSIFIER_ALGORITHMS = [
                                                        'kNN__weights': ['uniform', 'distance']}),
     ('SVM', SVC(probability=True,
                 class_weight='balanced',
-                random_state=seed), {'SVM__kernel': ['linear'],
+                random_state=seed), {'SVM__kernel': ['rbf'],
                                      'SVM__gamma': [1e-2, 1e-3],
                                      'SVM__C': [1, 10]}),
     ('BNB', BernoulliNB(alpha=1.0), {}),

@@ -1,12 +1,15 @@
 # this module is outlined
 # here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
 from app import create_app
-import sys, time
-from rq import get_current_job
-from app.db_models import db, Dataset, Chemical, QSARModel
-import pandas as pd
+from app.db_models import db, Dataset, Chemical, QSARModel, Task
 from app import chem_io
 from app import machine_learning as ml
+
+import sys, time
+import datetime
+from datetime import timezone
+from rq import get_current_job
+import pandas as pd
 
 app = create_app()
 app.app_context().push()
@@ -15,7 +18,7 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
 
     job = get_current_job()
     print("test")
-    job.meta['progress'] = 'Creating Descirptors'
+    job.meta['progress'] = 'Creating Features...'
     job.save_meta()
     query_statement = db.session.query(Chemical).join(Dataset,
                                                       Dataset.id == Chemical.dataset_id) \
@@ -46,7 +49,7 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
         scale = False
 
     # start training
-    job.meta['progress'] = 'Training Model'
+    job.meta['progress'] = 'Training Model...'
     job.save_meta()
     model, cv_preds, train_stats = ml.build_qsar_model(X,
                                                        y,
@@ -61,13 +64,22 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
                            dataset_id=dataset.id,
                            sklearn_model=model)
 
-    db.session.add(qsar_model)
-    db.session.commit()
+
+
+    # job done
+    # think about putting this into its own helper function
+    # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
     job.meta['progress'] = 'Complete'
     job.save_meta()
+    task = Task.query.get(job.get_id())
+    task.complete = True
+    task.time_completed = datetime.datetime.now(timezone.utc)
 
+    # not sure why I need to save this here
+    # and not in the parent function
+    db.session.add(qsar_model)
+    db.session.commit()
 
-    #finally:
 
 def example(seconds):
     job = get_current_job()

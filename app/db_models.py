@@ -100,6 +100,8 @@ class Task(db.Model):
     description = db.Column(db.String(128))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     complete = db.Column(db.Boolean, default=False)
+    time_submitted = db.Column(db.DateTime, default=datetime.utcnow)
+    time_completed = db.Column(db.DateTime)
 
     def get_rq_job(self):
         try:
