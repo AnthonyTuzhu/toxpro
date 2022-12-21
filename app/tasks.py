@@ -17,7 +17,6 @@ app.app_context().push()
 def build_qsar(user_id, dataset_name, descriptors, algorithm):
 
     job = get_current_job()
-    print("test")
     job.meta['progress'] = 'Creating Features...'
     job.save_meta()
     query_statement = db.session.query(Chemical).join(Dataset,

@@ -1,5 +1,27 @@
 ### BASIC SETUP
 
+To set up the conda env, you need to use the `requirements.txt` file to install
+the necessary python dependencies.
+
+First, create a new conda env
+
+```
+conda env create -n toxpro
+```
+
+then you need to activate
+
+```
+conda activate toxpro
+```
+then use pip to install dependencies
+
+```
+pip install -f requirements.txt
+```
+
+
+
 Getting started using the Flask tutorial: https://flask.palletsprojects.com/en/2.0.x/tutorial
 
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xix-deployment-on-docker-containers
@@ -49,7 +71,8 @@ container using:
 docker run --name my-redis -p 6379:6379 redis
 ```
 
-then in a separate terminal need to start the RQ worker.  This needs to be done with the ToxPro env
+then in a separate terminal need to start the RQ worker.  This needs to be done with the ToxPro env activated and in the
+directory root of the project (i.e., same level as `app/`)
 
 ```
 rq worker toxpro-tasks
