@@ -50,21 +50,46 @@ def PCA():
                         .filter(Dataset.user_id==current_user.id).statement
     df = pd.read_sql(query_statement, db.session.bind)
 
+    desc_set = ['MolWt', 'TPSA', 'NumRotatableBonds', 'NumHDonors', 'NumHAcceptors', 'MolLogP']
 
-    descriptors = chem_io.calc_descriptors_from_frame(df, scale=True)
+    descriptors = chem_io.calc_descriptors_from_frame(df, scale=True, desc_set=desc_set)
 
-    pca = pd.DataFrame(skl_PCA(n_components=2).fit_transform(descriptors),
-                       columns=['PCA1', 'PCA2'])
+    skl_PCA_fit = skl_PCA(n_components=3).fit(descriptors)
+    pca = pd.DataFrame(skl_PCA_fit.transform(descriptors),
+                       columns=['PCA1', 'PCA2', 'PCA3'])
 
     pca['CMP_ID'] = df.set_index('compound_id').loc[descriptors.index].index
     pca['Activity'] = df.set_index('compound_id').loc[descriptors.index].activity.values
 
-    print(pca)
-    fig = px.scatter(pca,
+    pca['Activity'] = pca['Activity'].astype('category')
+
+
+    fig = px.scatter_3d(pca,
                      x='PCA1',
                      y='PCA2',
-                     color='Activity'
+                     z='PCA3',
+                     color='Activity',
+                     hover_name='CMP_ID',
+                     hover_data=['Activity', 'PCA1', 'PCA2'],
+                     labels={
+                         "PCA1": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[0]),
+                         "PCA2": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[1]),
+                         "PCA3": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[2]),
+                     }
                      )
+
+    fig.update_layout(template='plotly_white',
+                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
+                      )
+    fig.update_xaxes(showline=True, linewidth=2, linecolor='black')
+    fig.update_yaxes(showline=True, linewidth=2, linecolor='black')
+    #fig.update_zaxes(showline=True, linewidth=2, linecolor='black')
+    fig.update_traces(marker=dict(size=6,
+                                  opacity=0.5,
+                                  #line=dict(width=2, color='DarkSlateGrey')
+                                  ),
+
+                      )
 
     # Create graphJSON
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)

@@ -6,12 +6,17 @@ import pandas as pd
 
 from sklearn.preprocessing import StandardScaler
 
-def calc_descriptors_from_frame(df: pd.DataFrame, scale=False) -> pd.DataFrame:
+def calc_descriptors_from_frame(df: pd.DataFrame, scale=False, desc_set=None) -> pd.DataFrame:
     """ calculates rdkit descriptors from a smiles.txt file """
 
     df['ROMol'] = [Chem.MolFromInchi(inchi) for inchi in df.inchi]
 
-    calc = MoleculeDescriptors.MolecularDescriptorCalculator([desc[0] for desc in Descriptors.descList])
+    if desc_set:
+        desc_set = [desc[0] for desc in Descriptors.descList if desc[0] in desc_set]
+    else:
+        desc_set = [desc[0] for desc in Descriptors.descList]
+
+    calc = MoleculeDescriptors.MolecularDescriptorCalculator(desc_set)
 
     X = pd.DataFrame([list(calc.CalcDescriptors(mol)) for mol in df['ROMol']],
                      columns=list(calc.GetDescriptorNames()),
