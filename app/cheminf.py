@@ -78,6 +78,10 @@ def PCA():
                          "PCA3": "PC3 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[2]),
                      },
                     height=800, # default height
+                    color_discrete_map={
+                        1: "rgba(255, 0, 0, 0.5)",
+                        0: "rgba(0, 0, 255, 0.5)"
+                        }
                      )
 
     fig.update_layout(template='plotly_white',
