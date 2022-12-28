@@ -39,8 +39,8 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
     last_login = db.Column(db.DateTime)
     user_created = db.Column(db.DateTime)
-    datasets = db.relationship('Dataset', backref='owner', lazy='dynamic')
-    tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    datasets = db.relationship('Dataset', backref='owner', lazy='dynamic', cascade="all, delete-orphan")
+    tasks = db.relationship('Task', backref='user', lazy='dynamic', cascade="all, delete-orphan")
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
@@ -67,8 +67,8 @@ class Dataset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='user-dataset'))
     dataset_name = db.Column(db.String)
-    chemicals = db.relationship('Chemical', backref='dataset', lazy='dynamic')
-    qsar_models = db.relationship('QSARModel', backref='qsarmodel', lazy='dynamic')
+    chemicals = db.relationship('Chemical', backref='dataset', lazy='dynamic', cascade="all, delete-orphan")
+    qsar_models = db.relationship('QSARModel', backref='qsarmodel', lazy='dynamic', cascade="all, delete-orphan")
 
     created = db.Column(db.DateTime, default=datetime.utcnow)
     __table_args__ = (

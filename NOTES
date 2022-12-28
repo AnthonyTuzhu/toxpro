@@ -54,6 +54,9 @@ started using flask migrations: https://blog.miguelgrinberg.com/post/the-flask-m
 
 flask db init to intializaize db
 
+Updates to the `db_models.py` classes need to be reflected in the database.  this requires two commands to be run.
+
+
 ## Redis Queue
 
 Redis Queue is a way to handle background tasks/jobs.  It requires a seperate server and installation outside

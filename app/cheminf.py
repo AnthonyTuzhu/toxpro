@@ -20,6 +20,7 @@ from sklearn.decomposition import PCA as skl_PCA
 
 import plotly
 import plotly.express as px
+import plotly.graph_objs as go
 
 import json
 
@@ -73,9 +74,10 @@ def PCA():
                      hover_data=['Activity', 'PCA1', 'PCA2'],
                      labels={
                          "PCA1": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[0]),
-                         "PCA2": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[1]),
-                         "PCA3": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[2]),
-                     }
+                         "PCA2": "PC2 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[1]),
+                         "PCA3": "PC3 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[2]),
+                     },
+                    height=800, # default height
                      )
 
     fig.update_layout(template='plotly_white',
@@ -90,6 +92,27 @@ def PCA():
                                   ),
 
                       )
+
+    camera = dict(
+        eye=dict(x=0., y=2.5, z=0),
+    )
+
+    fig.update_layout(scene_camera=camera, scene_dragmode='orbit')
+
+
+
+    # fig.update_layout(shapes=[
+    #     # unfilled rectange
+    #     go.layout.Shape(
+    #         type="rect",
+    # xref ="paper",
+    # yref ="paper",
+    # x0 = 0,
+    # y0 = -0.1,
+    # x1 = 1.05,
+    # y1 = 1,
+    # line = {"width": 1, "color": "black"})])
+
 
     # Create graphJSON
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)

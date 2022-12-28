@@ -14,7 +14,7 @@
         <div class="col-sm-6">
             <div class="card shadow p-3 mb-5 bg-white rounded">
               <div class="card-body">
-                  <form action="{{ url_for('toxpro.uploaddataset') }}" method="post" enctype="multipart/form-data" name="">
+                  <form action="{{ url_for('toxpro.upload_dataset') }}" method="post" enctype="multipart/form-data" name="">
                       <h5 class="card-title">Upload a dataset.</h5>
                       <p class="card-text">Please select a file to upload a new dataset. Datasets should be in an SDFile.</p>
 
@@ -42,15 +42,26 @@
           </div>
 
         <div class="col-sm-6">
+
         {% if user_datasets %}
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+              <div class="card-body">
                 <div class="form-group">
+                <form action="{{ url_for('toxpro.remove_dataset') }}" method="post" enctype="multipart/form-data">
                   <label for="dataset-selection">Select dataset:</label>
-                  <select class="form-control" id="dataset-selection">
+                  <select class="form-control" name="dataset-selection">
                     {% for dataset in user_datasets %}
                         <option value="{{ dataset.dataset_name }}"> {{ dataset.dataset_name }}</option>
                     {% endfor %}
                   </select>
+                  <input type="submit" style="color: white;"
+                         class="btn btn-danger btn-padding"
+                         value="Remove dataset" onclick="loading()">
+                </form>
+
                 </div>
+              </div>
+            </div>
 
         {% endif %}
           </div>

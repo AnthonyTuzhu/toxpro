@@ -40,12 +40,12 @@ def datasets():
     displays the homepage
 
     """
-    return render_template('toxpro/datasets.html', user_datasets=current_user.datasets)
+    return render_template('toxpro/datasets.html', user_datasets=list(current_user.datasets))
 
 
-@bp.route('/uploaddataset', methods=['POST'])
+@bp.route('/upload_dataset', methods=['POST'])
 @login_required
-def uploaddataset():
+def upload_dataset():
     """
     uploads a dataset
 
@@ -98,21 +98,42 @@ def uploaddataset():
                 cmp_id = row[compound_id_col]
                 inchi = Chem.MolToInchi(mol)
 
-                if activity and cmp_id and inchi:
+                if activity and cmp_id and inchi and (activity in [1, 0, '1', '0', '1.0', '0.0']):
                     chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
                     dataset.chemicals.append(chem)
 
             db.session.add(dataset)
             db.session.commit()
 
-
-            flash(f'Uploaded {name} as a new dataset', 'success')
+            num_chemicals =len(list(dataset.chemicals))
+            flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
             return redirect(url_for('toxpro.datasets'))
 
 
     flash(error, 'danger')
 
     return redirect(url_for('toxpro.datasets'))
+
+
+@bp.route('/remove_dataset', methods=['POST'])
+@login_required
+def remove_dataset():
+    """
+    uploads a dataset
+
+    """
+
+    dataset_selection = request.form['dataset-selection'].strip()
+
+    dataset = Dataset.query.filter_by(dataset_name=dataset_selection).first()
+    print(dataset)
+    db.session.delete(dataset)
+    db.session.commit()
+    message = f"Removed {dataset_selection}"
+    flash(message, 'danger')
+
+    return redirect(url_for('toxpro.datasets'))
+
 
 @bp.route('/curator', methods=['GET'])
 @login_required
