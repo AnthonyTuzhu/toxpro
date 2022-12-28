@@ -74,6 +74,7 @@ def upload_dataset():
             db.session.add(dataset)
             #db.session.commit()
         except exc.IntegrityError:
+            db.session.rollback()
             error = f'Sorry, there is already a dataset named {name}'
             flash(error, 'danger')
             return redirect(url_for('toxpro.datasets'))

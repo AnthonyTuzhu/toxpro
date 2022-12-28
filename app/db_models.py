@@ -3,6 +3,9 @@
 # and help from
 # https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login
 # and https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
+#
+# There was also a nice tutorial on how register a user
+# outlined here: https://realpython.com/handling-email-confirmation-in-flask/
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
@@ -15,7 +18,12 @@ from datetime import datetime
 from sqlalchemy import MetaData
 import redis
 import rq
+import jwt
+from time import time
+# from app import create_app
 
+# app = create_app()
+# app.app_context().push()
 
 # this is a fix for unique constrains
 # and forien keys in Flask-migrate
@@ -39,6 +47,13 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
     last_login = db.Column(db.DateTime)
     user_created = db.Column(db.DateTime)
+
+    # an attribute to restrict functionality
+    admin = db.Column(db.Boolean, default=False)
+
+    confirmed = db.Column(db.Boolean, default=False)
+    confirmed_on = db.Column(db.DateTime)
+
     datasets = db.relationship('Dataset', backref='owner', lazy='dynamic', cascade="all, delete-orphan")
     tasks = db.relationship('Task', backref='user', lazy='dynamic', cascade="all, delete-orphan")
     def __repr__(self):
@@ -62,6 +77,19 @@ class User(db.Model, UserMixin):
         return Task.query.filter_by(name=name, user=self,
                                     complete=False).first()
 
+    def get_token(self, kind: str='reset_password', expires_in=600):
+        return jwt.encode(
+            {kind: self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'], algorithm='HS256')
+
+    @staticmethod
+    def verify_token(token, kind):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])[kind]
+        except:
+            return
+        return User.query.get(id)
 
 class Dataset(db.Model):
     id = db.Column(db.Integer, primary_key=True)

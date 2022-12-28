@@ -80,3 +80,10 @@ directory root of the project (i.e., same level as `app/`)
 ```
 rq worker toxpro-tasks
 ```
+
+## Email
+
+was able to set up the email using google and this: https://stackoverflow.com/questions/72478573/how-to-send-an-email-using-python-after-googles-policy-update-on-not-allowing-j
+
+
+## Deployment on Digital Ocean

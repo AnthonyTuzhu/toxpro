@@ -10,9 +10,10 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'toxpro.sqlite'),
-        SQLALCHEMY_TRACK_MODIFICATIONS=False
-    )
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
 
+    )
+    app.config.from_object('app.config.DevConfig')
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -53,6 +54,8 @@ def create_app(test_config=None):
     app.redis = Redis.from_url('redis://')
     app.task_queue = rq.Queue('toxpro-tasks', connection=app.redis)
 
+    from .email import mail
+    mail.init_app(app)
 
     return app
 

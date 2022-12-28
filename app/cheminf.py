@@ -94,7 +94,6 @@ def PCA():
                                   opacity=0.5,
                                   #line=dict(width=2, color='DarkSlateGrey')
                                   ),
-
                       )
 
     camera = dict(
