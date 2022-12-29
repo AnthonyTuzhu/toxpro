@@ -27,21 +27,22 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
         .filter(Dataset.user_id == user_id).statement
     df = pd.read_sql(query_statement, db.session.bind)
 
-    dataset = Dataset.query.filter_by(dataset_name=dataset_name).first()
+    dataset = Dataset.query.filter_by(dataset_name=dataset_name, user_id=user_id).first()
     # erase exists models and results
     qsar_model = QSARModel.query.filter_by(user_id=user_id,
                                            algorithm=algorithm,
                                            descriptors=descriptors,
                                            dataset_id=dataset.id).first()
 
-    # erase exists models
-    cv_results = CVResults.query.filter_by(qsar_model_id=qsar_model.id).first()
+
 
     if qsar_model:
-        db.session.delete(qsar_model)
+        # erase exists models
+        cv_results = CVResults.query.filter_by(qsar_model_id=qsar_model.id).first()
 
-    if cv_results:
-        db.session.delete(cv_results)
+        if cv_results:
+            db.session.delete(cv_results)
+        db.session.delete(qsar_model)
 
     # create descriptors
     X = chem_io.get_desc(df, descriptors)

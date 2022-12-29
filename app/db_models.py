@@ -100,7 +100,7 @@ class Dataset(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', name='user-dataset'))
     dataset_name = db.Column(db.String)
     chemicals = db.relationship('Chemical', backref='dataset', lazy='dynamic', cascade="all, delete-orphan")
-    qsar_models = db.relationship('QSARModel', backref='qsarmodel', lazy='dynamic', cascade="all, delete-orphan")
+    qsar_models = db.relationship('QSARModel', backref='dataset', lazy='dynamic', cascade="all, delete-orphan")
 
     created = db.Column(db.DateTime, default=datetime.utcnow)
     __table_args__ = (
@@ -110,7 +110,7 @@ class Dataset(db.Model):
 class Chemical(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     inchi = db.Column(db.String)
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id', name='dataset-chemical'))
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
     activity = db.Column(db.Integer)
     compound_id = db.Column(db.String)
 
@@ -121,11 +121,15 @@ class QSARModel(db.Model):
     name = db.Column(db.String)
     algorithm = db.Column(db.String)
     descriptors = db.Column(db.String)
-    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id', name='dataset-chemical'))
+    dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
     sklearn_model = db.Column(db.BLOB)
     created = db.Column(db.DateTime, default=datetime.utcnow)
 
-    cvresults = db.relationship('CVResults', backref='qsar_model', lazy='dynamic', cascade="all, delete-orphan")
+    cvresults = db.relationship('CVResults',
+                                backref='qsar_model',
+                                cascade="all, delete-orphan",
+                                uselist=False # specifies one-to-one
+                                )
 
 class CVResults(db.Model):
     """ class for handling and storing five fold cross validation results from QSAR modeling

@@ -74,7 +74,7 @@
                         </div>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="descriptor-selection" value="RDKit">
-                            <label class="form-check-label" for="radioRdkit">RDKit Descirptors</label>
+                            <label class="form-check-label" for="radioRdkit">RDKit Descriptors</label>
                         </div>
                     </div>
                     <div class="col-4">
@@ -106,56 +106,7 @@
                 </div>
                </form>
 
-              {% if qsar_results %}
-              <div class="row pt-4">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Accuracy</td>
-                            <td>{{ "{:.2%}".format(qsar_results['ACC']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>F1-Score</td>
-                            <td>{{ "{:.2%}".format(qsar_results['F1-Score']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Area Under the ROCurve</td>
-                            <td>{{ "{:.2%}".format(qsar_results['AUC']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Cohen's Kappa</td>
-                            <td>{{ "{:.2%}".format(qsar_results['ACC']) }}</td>
-                        </tr>
-                            <tr>
-                            <td>Michael's Correlation Coefficient</td>
-                            <td>{{ "{:.2%}".format(qsar_results['MCC']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Precision/PPV</td>
-                            <td>{{ "{:.2%}".format(qsar_results['Precision/PPV']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Recall</td>
-                            <td>{{ "{:.2%}".format(qsar_results['Recall']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Specificity</td>
-                            <td>{{ "{:.2%}".format(qsar_results['Specificity']) }}</td>
-                        </tr>
-                        <tr>
-                            <td>Correct Classification Rate</td>
-                            <td>{{ "{:.2%}".format(qsar_results['CCR']) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-              </div>
-              {% endif %}
+
               {% if user.get_tasks_in_progress() %}
               <div class="row pt-4">
               <h3>Jobs</h3>
@@ -185,12 +136,39 @@
           </div>
         </div>
 
-        {% if True %}
+        {% if user.has_qsar %}
         <div class="row">
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
                 <div class="card-body">
-                    <p>test</p>
+                <div class="row pt-4">
+                <h3>Trained Models</h3>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                            <th>F1-Score</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>Specificity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for dataset in user.datasets %}
+                        {% for qsar_model in dataset.qsar_models %}
+                        <tr>
+                            <td>{{ qsar_model.name }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.accuracy) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.f1_score) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.precision) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.recall) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.specificity) }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
                 </div>
             </div>
           </div>

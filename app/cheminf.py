@@ -130,7 +130,7 @@ def QSAR_build():
 
 
     """
-
+    current_user.has_qsar = any(d.qsar_models for d in current_user.datasets)
     if request.method == 'GET':
         return render_template('cheminf/QSAR-build.html', user_datasets=list(current_user.datasets), user=current_user)
 

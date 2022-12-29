@@ -143,7 +143,7 @@ def remove_dataset():
 
     dataset_selection = request.form['dataset-selection'].strip()
 
-    dataset = Dataset.query.filter_by(dataset_name=dataset_selection).first()
+    dataset = Dataset.query.filter_by(dataset_name=dataset_selection, user_id=current_user.id).first()
     print(dataset)
     db.session.delete(dataset)
     db.session.commit()
