@@ -130,6 +130,8 @@ class QSARModel(db.Model):
 class CVResults(db.Model):
     """ class for handling and storing five fold cross validation results from QSAR modeling
 
+    child of QSARModel
+
      """
     id = db.Column(db.Integer, primary_key=True)
     accuracy = db.Column(db.Float)

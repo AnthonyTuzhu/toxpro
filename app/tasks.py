@@ -1,7 +1,7 @@
 # this module is outlined
 # here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
 from app import create_app
-from app.db_models import db, Dataset, Chemical, QSARModel, Task
+from app.db_models import db, Dataset, Chemical, QSARModel, Task, CVResults
 from app import chem_io
 from app import machine_learning as ml
 
@@ -15,6 +15,8 @@ app = create_app()
 app.app_context().push()
 
 def build_qsar(user_id, dataset_name, descriptors, algorithm):
+    """ function that ties together the entirity of building a QSAR model
+     this is necessary to be able to submit as a task in redis. """
 
     job = get_current_job()
     job.meta['progress'] = 'Creating Features...'
@@ -26,14 +28,20 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
     df = pd.read_sql(query_statement, db.session.bind)
 
     dataset = Dataset.query.filter_by(dataset_name=dataset_name).first()
-    # erase exists models
+    # erase exists models and results
     qsar_model = QSARModel.query.filter_by(user_id=user_id,
                                            algorithm=algorithm,
                                            descriptors=descriptors,
                                            dataset_id=dataset.id).first()
 
+    # erase exists models
+    cv_results = CVResults.query.filter_by(qsar_model_id=qsar_model.id).first()
+
     if qsar_model:
         db.session.delete(qsar_model)
+
+    if cv_results:
+        db.session.delete(cv_results)
 
     # create descriptors
     X = chem_io.get_desc(df, descriptors)
@@ -62,9 +70,22 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
                            descriptors=descriptors,
                            dataset_id=dataset.id,
                            sklearn_model=model)
+    db.session.add(qsar_model)
+    db.session.commit()
 
 
 
+    cv_results = CVResults(qsar_model_id=qsar_model.id,
+                           accuracy=train_stats['ACC'],
+                           f1_score=train_stats['F1-Score'],
+                           area_under_roc=train_stats['AUC'],
+                           cohens_kappa=train_stats['Cohen\'s Kappa'],
+                           michaels_correlation=train_stats['MCC'],
+                           precision=train_stats['Precision/PPV'],
+                           recall=train_stats['Recall'],
+                           specificity=train_stats['Specificity'],
+                           correct_classification_rate=train_stats['CCR'],
+                           )
     # job done
     # think about putting this into its own helper function
     # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
@@ -76,7 +97,8 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
 
     # not sure why I need to save this here
     # and not in the parent function
-    db.session.add(qsar_model)
+
+    db.session.add(cv_results)
     db.session.commit()
 
 
