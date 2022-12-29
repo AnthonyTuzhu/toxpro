@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 
+    <div class="row ">
+          <div class="col-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                  <h3>QSAR Predict</h3>
+                  <p class="card-text">In this tab, you can select a previously built QSAR model to make predictions on a set chemicals.
+                      After prediction, the modified SDF file will be directly downloaded to the user's computer.</p>
+
+
+              </div>
+            </div>
+          </div>
+    </div>
+
+
         <div class="row">
           <div class="col-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
@@ -50,10 +65,5 @@
             </div>
           </div>
         </div>
-
-
-
-
-
 
 {% endblock %}

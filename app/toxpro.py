@@ -33,6 +33,23 @@ def index():
     return render_template('toxpro/home.html')
 
 
+@bp.route('/about', methods=['GET'])
+def about():
+    """
+    displays the about page
+
+    """
+    return render_template('toxpro/about.html')
+
+
+@bp.route('/contact', methods=['GET'])
+def contact():
+    """
+    displays the contact homepage
+
+    """
+    return render_template('toxpro/contact.html')
+
 @bp.route('/datasets', methods=['GET'])
 @login_required
 def datasets():

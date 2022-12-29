@@ -6,6 +6,20 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
+                  <h3>Principal Component Analysis</h3>
+                  <p>Principal Component Analysis (PCA) is a dimension reduction technique useful for visualizing chemical space.
+                      Select a dataset and click "Perform PCA" to visualize its chemical space.  Chemicals will be colored
+                      according to their assigned activity (active, 1: red; inactive, 0: blue).</p>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
                   {% if not user_datasets %}
                   <p class="card-text">Please upload a dataset to be able to perform principal component analysis.</p>
                   {% endif %}

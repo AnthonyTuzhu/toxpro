@@ -3,6 +3,28 @@
 
     <div>
 
+    <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+                <div class="card-body">
+                    <h3>
+                        QSAR Builder
+                    </h3>
+                        <p>Quantitative Structure-Activity Relationship (QSAR) models are statistical models relating
+                            chemical structures to observed biological activitiies.  A model is defined in this tab
+                            as a pair of features (e.g., ECFP6 fingerprints) and a machine learning algoritm
+                            (e.g., Random Forest).  A QSAR model can be built by selecting a dataset, feature set,
+                        and machine learning algorithm and pressing the "Build QSAR" button.  Depending on numerous factors,
+                        modeling training can take a while.  Therefore, models are submitted as "jobs" and the progressed can
+                        be viewed by refreshing your browser.</p>
+
+
+                </div>
+            </div>
+          </div>
+    </div>
+
+
 
         <div class="row">
           <div class="col-sm-12">
@@ -23,8 +45,7 @@
                 <div class="row">
 
                     <div class="col-lg-12">
-                        <p><strong>Build a QSAR model.</strong>  A model is definted as a pair of features (e.g., ECFP6 fingerprints)
-                        and a machine learning algoritm (e.g., Random Forest).  </p>
+
                     </div>
                 </div>
 
@@ -164,7 +185,17 @@
           </div>
         </div>
 
-
+        {% if True %}
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+                <div class="card-body">
+                    <p>test</p>
+                </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
     </div>
 
 {% endblock %}

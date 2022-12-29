@@ -200,7 +200,6 @@ def resend_confirmation_email():
         user = User.query.filter_by(username=username).first()
     else:
         user = None
-
     if user:
         if user.confirmed:
             flash(f'User already confirmed.', 'success')

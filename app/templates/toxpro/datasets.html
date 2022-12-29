@@ -11,6 +11,33 @@
 <div class="dataset-body">
 
     <div class="row">
+        <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+              <div class="card-body">
+
+                  <h3>Dataset upload</h3>
+                  <p>
+                      Data uploaded to ToxPro must be in the
+                      <a href="http://biotech.fyicenter.com/resource/sdf_format.html">Structure Data Format (SDF) format</a>.
+                      <span class="font-weight-bold font-italic">Every chemical in the dataset must contain two properties</span>.
+                      These are (1) an activity and (2) a unique compound identifier (ID).  These properties can be named
+                      anything in the SDF file, however, they must be provided in the appropriate fields below.  If not provided,
+                      then they are assumed to be Activity and CMP_ID.
+                  </p>
+                  <h5>Activity Property</h5>
+                  <p>The activity must be a binarized property of every chemical (i.e., every chemical must be assigned
+                  a value of either 1 or 0).  Any chemicals without this property or any value other than 1 or 0 will
+                  not be uploaded.</p>
+                  <h5>Compound ID Property</h5>
+                  <p>Every chemical must have a unique compound identifier (ID).  It is important to make sure this field
+                  is unique (i.e., no duplicate values). </p>
+              </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
         <div class="col-sm-6">
             <div class="card shadow p-3 mb-5 bg-white rounded">
               <div class="card-body">
