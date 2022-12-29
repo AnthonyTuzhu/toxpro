@@ -1,3 +1,6 @@
+# This is the module for mapping database ORM models
+# to the SQLite database
+#
 # this module is outlined
 # here: https://flask.palletsprojects.com/en/2.0.x/tutorial/database/
 # and help from
@@ -41,6 +44,7 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 migrate = Migrate(db)
 
 class User(db.Model, UserMixin):
+    """ Main class to handle users """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -120,6 +124,25 @@ class QSARModel(db.Model):
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id', name='dataset-chemical'))
     sklearn_model = db.Column(db.BLOB)
     created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    cvresults = db.relationship('CVResults', backref='qsar_model', lazy='dynamic', cascade="all, delete-orphan")
+
+class CVResults(db.Model):
+    """ class for handling and storing five fold cross validation results from QSAR modeling
+
+     """
+    id = db.Column(db.Integer, primary_key=True)
+    accuracy = db.Column(db.Float)
+    f1_score = db.Column(db.Float)
+    area_under_roc = db.Column(db.Float)
+    cohens_kappa = db.Column(db.Float)
+    michaels_correlation = db.Column(db.Float)
+    precision = db.Column(db.Float)
+    recall = db.Column(db.Float)
+    specificity = db.Column(db.Float)
+    correct_classification_rate = db.Column(db.Float)
+
+    qsar_model_id = db.Column(db.Integer, db.ForeignKey('qsar_model.id'))
 
 
 class Task(db.Model):
