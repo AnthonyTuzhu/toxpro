@@ -86,4 +86,9 @@ rq worker toxpro-tasks
 was able to set up the email using google and this: https://stackoverflow.com/questions/72478573/how-to-send-an-email-using-python-after-googles-policy-update-on-not-allowing-j
 
 
+## Docker and GUNICORN
+
+Runing the app in the docker container was very slow unitl I changed the setings in `.\boot.sh` as per this blog:
+https://pythonspeed.com/articles/gunicorn-in-docker/.
+
 ## Deployment on Digital Ocean
