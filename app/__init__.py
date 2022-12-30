@@ -8,7 +8,6 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'toxpro.sqlite'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
 
@@ -51,7 +50,8 @@ def create_app(test_config=None):
     app.register_blueprint(toxpro.bp)
     app.add_url_rule('/', endpoint='index')
 
-    app.redis = Redis.from_url('redis://')
+    #app.redis = Redis.from_url('redis://toxpro-redis-1:6379')
+    app.redis = Redis('toxpro-redis-1', 6379)
     app.task_queue = rq.Queue('toxpro-tasks', connection=app.redis)
 
     from .email import mail
