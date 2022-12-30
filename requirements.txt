@@ -12,4 +12,5 @@ scikit-learn==1.2.0
 redis==4.4.0
 rq==1.11.1
 PyJWT==2.6.0
+numpy==1.23.2
 
