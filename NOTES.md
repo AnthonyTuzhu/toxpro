@@ -80,6 +80,13 @@ directory root of the project (i.e., same level as `app/`)
 ```
 rq worker toxpro-tasks
 ```
+### Docker, Redis and rq
+
+Docker, redis and rq were not trivial to get working together, but [this](https://github.com/fcakyon/flask-redis-docker) template
+structure and [this](https://blog.abbasmj.com/implementing-redis-task-queues-and-deploying-on-docker-compose) blog post were 
+pretty helpful.  This biggest challenge was getting recognizing that the container names (e.g., `toxpro-redis-1`) was required
+for connecting from the app.  There was also an issue with naming the workers and the queue (apparently these are different).
+
 
 ## Email
 
@@ -92,3 +99,24 @@ Runing the app in the docker container was very slow unitl I changed the setings
 https://pythonspeed.com/articles/gunicorn-in-docker/.
 
 ## Deployment on Digital Ocean
+
+-Created a project with a droplet at the cheapest price.  I used the 1-click docker
+installed droplet as outlined [here](https://www.digitalocean.com/community/tutorials/how-to-use-the-docker-1-click-install-on-digitalocean)
+
+I then created images of all the containers and used `docker compose push` to push them
+to my repo [here are the docs](https://docs.docker.com/engine/reference/commandline/compose_push/) for that command.
+
+I then copied the `.env` and `docker-compose.yml` files over to the droplet and did the `docker compose pull`. 
+
+I did have to create an instance of the of the `instance` folder to map the sqlite and copy that 
+over as well.  
+
+There is probably a better way to do this. 
+
+Well the above did not work, due to the M1 chips and building on a mac vs linux.  The temp solution
+now is just to copy all the code to and build on the droplet. 
+
+Need to create a new user toxpro because I was getting errors writing to the SQLite database
+due to permissions.  Outlined [here](https://www.digitalocean.com/community/tutorials/how-to-create-a-new-sudo-enabled-user-on-ubuntu-18-04-quickstart)
+
+Then, I needed to intall docker compose as outline [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04).
