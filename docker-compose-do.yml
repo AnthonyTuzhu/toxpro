@@ -13,7 +13,7 @@ services:
         env_file:
             - docker-environment.env
         ports:
-            - "5000:80"
+            - "80:5000"
         image: danrusso/toxpro:lastest
         volumes:
             - ./instance/:/home/toxpro/instance
