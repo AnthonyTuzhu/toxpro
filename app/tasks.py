@@ -25,7 +25,7 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
                                                       Dataset.id == Chemical.dataset_id) \
         .filter(Dataset.dataset_name == dataset_name) \
         .filter(Dataset.user_id == user_id).statement
-    df = pd.read_sql(query_statement, db.session.bind)
+    df = pd.read_sql(query_statement, db.session.connection())
 
     dataset = Dataset.query.filter_by(dataset_name=dataset_name, user_id=user_id).first()
     # erase exists models and results
