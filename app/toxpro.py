@@ -13,6 +13,7 @@ import json, os, ntpath
 from app.db_models import User, Dataset, Chemical, db
 from flask_login import current_user, login_required
 from sqlalchemy import exc
+import pandas as pd
 
 bp = Blueprint('toxpro', __name__)
 
@@ -110,15 +111,27 @@ def upload_dataset():
             error = f'Compound ID {compound_id_col} not in SDFile.'
 
         if error == None:
+
+            # coerce activity column to be
+            # integer
+            mols_df[activity_col] = pd.to_numeric(mols_df[activity_col], errors='coerce')
+            mols_df = mols_df[mols_df[activity_col].notnull()]
+            mols_df = mols_df[(mols_df[activity_col] == 0) | (mols_df[activity_col] == 1)]
+            mols_df[activity_col] = mols_df[activity_col].astype(int)
+
+            mols_df = mols_df.sort_values(activity_col, ascending=False)
+            mols_df = mols_df.drop_duplicates(compound_id_col, keep='first')
+
             for i, row in mols_df.iterrows():
                 mol = row.ROMol
                 activity = row[activity_col]
                 cmp_id = row[compound_id_col]
                 inchi = Chem.MolToInchi(mol)
 
-                if activity and cmp_id and inchi and (activity in [1, 0, '1', '0', '1.0', '0.0']):
+                if cmp_id and inchi and (activity in [1, 0, '1', '0', '1.0', '0.0']):
                     chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
                     dataset.chemicals.append(chem)
+
 
             db.session.add(dataset)
             db.session.commit()
