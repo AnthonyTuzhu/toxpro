@@ -90,7 +90,7 @@ def upload_dataset():
         try:
             dataset = Dataset(user_id=current_user.id, dataset_name=name)
             db.session.add(dataset)
-            #db.session.commit()
+            db.session.commit()
         except exc.IntegrityError:
             db.session.rollback()
             error = f'Sorry, there is already a dataset named {name}'
