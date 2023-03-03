@@ -120,3 +120,32 @@ Need to create a new user toxpro because I was getting errors writing to the SQL
 due to permissions.  Outlined [here](https://www.digitalocean.com/community/tutorials/how-to-create-a-new-sudo-enabled-user-on-ubuntu-18-04-quickstart)
 
 Then, I needed to intall docker compose as outline [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04).
+
+push all the code with somethign like this:
+
+```commandline
+scp -r ~/projects/toxpro/* toxpro@192.241.131.84:/home/toxpro
+```
+
+Log in and using docker compose to build containers
+
+```commandline
+docker compose up -d
+```
+
+
+## Docker commands
+
+remove all containers
+```dockerfile
+sudo docker system prune -a
+```
+
+force recreate of building image and containers
+```dockerfile
+docker compose -f docker-compose-do.yml up
+```
+or this
+```dockerfile
+docker compose -f docker-compose-do.yml up -d --build
+```
