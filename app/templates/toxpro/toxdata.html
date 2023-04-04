@@ -8,15 +8,31 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-
-                  <p class="card-text">We're sorry this function has not yet been implemented.</p>
+                  <h3>Tox Data</h3>
+                  <p>Overview of Tox Data.</p>
 
               </div>
             </div>
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
 
-    </div>
+                    {% if pca_plot %}
+                        <div id='chart' class='chart'”></div>
+                    {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+    <script type='text/javascript'>
+      var graphs = {{pca_plot | safe}};
+      Plotly.plot('chart',graphs, {});
+    </script>
 
 {% endblock %}

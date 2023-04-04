@@ -195,5 +195,21 @@ def toxdata():
     displays the homepage
 
     """
+    import numpy as np
 
-    return render_template('toxpro/toxdata.html')
+    pca = pd.DataFrame(
+        {
+            'PC1': np.random.random(size=(100, )),
+            'PC2': np.random.random(size=(100,)),
+            'PC3': np.random.random(size=(100,)),
+        }
+    )
+
+    fig = px.scatter_3d(pca,
+                     x='PC1',
+                     y='PC2',
+                     z='PC3')
+
+    pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template('toxpro/toxdata.html', pca_plot=pca_plot)
