@@ -211,5 +211,8 @@ def toxdata():
                      z='PC3')
 
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    bar_plot = None
 
-    return render_template('toxpro/toxdata.html', pca_plot=pca_plot)
+    return render_template('toxpro/toxdata.html',
+                           bar_blot=bar_plot,
+                           pca_plot=pca_plot)

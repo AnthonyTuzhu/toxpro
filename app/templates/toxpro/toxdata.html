@@ -17,13 +17,18 @@
         </div>
 
         <div class="row">
-          <div class="col-sm-12">
+          <div class="col-6">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-
-                    {% if pca_plot %}
                         <div id='chart' class='chart'”></div>
-                    {% endif %}
+              </div>
+            </div>
+          </div>
+
+        <div class="col-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                        <div id='bar-chart' class='chart'”></div>
               </div>
             </div>
           </div>
@@ -33,6 +38,9 @@
     <script type='text/javascript'>
       var graphs = {{pca_plot | safe}};
       Plotly.plot('chart',graphs, {});
+
+      var graphs = {{bar_plot | safe}};
+      Plotly.plot('bar-chart',graphs, {});
     </script>
 
 {% endblock %}
