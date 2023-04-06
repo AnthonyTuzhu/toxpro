@@ -157,6 +157,7 @@
                     <tbody>
                     {% for dataset in user.datasets %}
                         {% for qsar_model in dataset.qsar_models %}
+                            {% if qsar_model.cvresults %}
                         <tr>
                             <td>{{ qsar_model.name }}</td>
                             <td>{{ '{:.2%}'.format(qsar_model.cvresults.accuracy) }}</td>
@@ -165,6 +166,16 @@
                             <td>{{ '{:.2%}'.format(qsar_model.cvresults.recall) }}</td>
                             <td>{{ '{:.2%}'.format(qsar_model.cvresults.specificity) }}</td>
                         </tr>
+                            {% else %}
+                        <tr>
+                            <td>{{ qsar_model.name }}</td>
+                            <td> NA </td>
+                            <td> NA </td>
+                            <td> NA </td>
+                            <td> NA </td>
+                            <td> NA </td>
+                        </tr>
+                            {% endif %}
                         {% endfor %}
                     {% endfor %}
                     </tbody>
