@@ -36,11 +36,11 @@
 
 
     <script type='text/javascript'>
-      var graphs = {{pca_plot | safe}};
-      Plotly.plot('chart',graphs, {});
+      var pcaPlot = {{pca_plot | safe}};
+      Plotly.plot('chart', pcaPlot, {});
 
-      var graphs = {{bar_plot | safe}};
-      Plotly.plot('bar-chart',graphs, {});
+      var barChart = {{bar_plot | safe}};
+      Plotly.plot('bar-chart', barChart, {});
     </script>
 
 {% endblock %}
