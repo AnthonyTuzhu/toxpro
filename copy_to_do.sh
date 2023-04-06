@@ -1,2 +1,4 @@
 #!/bin/bash
-scp -r ~/projects/toxpro/* toxpro@192.241.131.84:/home/toxpro
+# always copy the database before pulling it
+scp toxpro@192.241.131.84:/home/toxpro/instance/toxpro.sqlite instance/
+scp -r ./* toxpro@192.241.131.84:/home/toxpro

@@ -149,3 +149,8 @@ or this
 ```dockerfile
 docker compose -f docker-compose-do.yml up -d --build
 ```
+
+this is even betteR?  works when getting `There is already an active worker error`
+```dockerfile
+sudo docker compose -f docker-compose-do.yml up -d --build --force-recreate
+```
