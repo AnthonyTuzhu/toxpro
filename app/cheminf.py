@@ -213,7 +213,7 @@ def QSAR_predict():
             PandasTools.WriteSDF(mols_df_trim, user_uploaded_file,
                                  properties=mols_df_trim.drop('ROMol', axis=1).columns)
             return flask.send_file(user_uploaded_file,
-                                   attachment_filename=compound_filename.replace('.sdf', '_predicted.sdf'))
+                                   download_name=compound_filename.replace('.sdf', '_predicted.sdf'))
 
 
     if error:
