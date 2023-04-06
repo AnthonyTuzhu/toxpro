@@ -39,3 +39,5 @@ Dockerfile
 run_docker*.sh
 
 api/api_config.py
+/app/config.py
+/docker-environment.env
