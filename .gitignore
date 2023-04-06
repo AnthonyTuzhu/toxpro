@@ -3,18 +3,10 @@
 .spyderworkspace
 
 # ignore the config files
-ciipro_config.py
-ciipro_app.wsgi
+config.py
 
 /__pycache__
 
-# database
-users.db
-
-# uploads folders
-
-/uploads.lustre
-/uploads_local
 
 # vim files 
 *.swp
@@ -22,9 +14,6 @@ users.db
 # .pyc files
 *.pyc
 
-# ignore the notes file that contains 
-# info about the CIIPro app
-notes.txt
 
 .DS_Store
 
