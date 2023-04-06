@@ -1,16 +1,10 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask
 from flask_login import LoginManager
 from redis import Redis
 import rq
 
-
-def not_found(e):
-    return render_template('errors/404.html'), 404
-
-def internal_error(e):
-    return render_template('errors/500.html'), 500
 
 def create_app(test_config=None):
     # create and configure the app
@@ -65,6 +59,7 @@ def create_app(test_config=None):
     from .email import mail
     mail.init_app(app)
 
+    from .errors import not_found, internal_error
     # errors
     # TODO: put these in their own module
     app.register_error_handler(404, not_found)
