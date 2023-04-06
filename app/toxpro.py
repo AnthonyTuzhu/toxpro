@@ -139,7 +139,9 @@ def upload_dataset():
             num_chemicals =len(list(dataset.chemicals))
             flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
             return redirect(url_for('toxpro.datasets'))
-
+        else:
+            db.session.delete(dataset)
+            db.session.commit()
 
     flash(error, 'danger')
 
