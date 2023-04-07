@@ -12,7 +12,7 @@ services:
         build: .
         # this is outlined here: https://docs.docker.com/compose/environment-variables/
         env_file:
-            - docker-environment.env
+            - docker-environment-do.env
         ports:
             - "80:5000"
         image: danrusso/toxpro:lastest
