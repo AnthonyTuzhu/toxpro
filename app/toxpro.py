@@ -204,18 +204,11 @@ def toxdata():
 
     PCA_DF = master_db.make_query('select * from chemical_space')
 
-    fig = plotly.graph_objs.Figure(data=[
-        plotly.graph_objs.Scatter(
+    fig = px.scatter_3d(
             x=PCA_DF["PCA1"],
             y=PCA_DF["PCA2"],
-            mode="markers",
-            marker=dict(
-                line={"color": "#444"},
-                reversescale=True,
-                opacity=0.8,
+            z=PCA_DF["PCA3"],
             )
-        )
-    ])
 
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
