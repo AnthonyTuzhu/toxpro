@@ -20,14 +20,14 @@ seed = 0
 CLASSIFIER_ALGORITHMS = [
     ('RF', RandomForestClassifier(max_depth=10,  # max depth 10 to prevent overfitting
                                   class_weight='balanced',
-                                  random_state=seed), {'RF__n_estimators': [5, 10, 25]}),
-    ('kNN', KNeighborsClassifier(metric='euclidean'), {'kNN__n_neighbors': [1, 3, 5],
+                                  random_state=seed), {'RF__n_estimators': [5, 10, 25, 100, 200]}),
+    ('kNN', KNeighborsClassifier(metric='euclidean'), {'kNN__n_neighbors': [1, 3, 5, 10 , 20],
                                                        'kNN__weights': ['uniform', 'distance']}),
     ('SVM', SVC(probability=True,
                 class_weight='balanced',
-                random_state=seed), {'SVM__kernel': ['rbf'],
+                random_state=seed), {'SVM__kernel': ['linear', 'rbf', 'poly'],
                                      'SVM__gamma': [1e-2, 1e-3],
-                                     'SVM__C': [1, 10]}),
+                                     'SVM__C': [0.1, 1, 10]}),
     ('BNB', BernoulliNB(alpha=1.0), {}),
     ('ADA', AdaBoostClassifier(n_estimators=100, learning_rate=0.9, random_state=seed), {})
 ]

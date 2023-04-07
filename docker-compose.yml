@@ -15,7 +15,7 @@ services:
             - docker-environment.env
         ports:
             - "5000:5000"
-        image: danrusso/toxpro:lastest
+        image: toxpro
         volumes:
             - ./instance/:/home/toxpro/instance
         entrypoint: ["./boot.sh"]
@@ -23,7 +23,9 @@ services:
         tty: true
 
     worker:
-        image: danrusso/toxpro:lastest
+        build: .
+        env_file:
+            - docker-environment.env
         depends_on:
             - redis
             - toxpro

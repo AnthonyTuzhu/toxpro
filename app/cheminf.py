@@ -14,6 +14,7 @@ from rdkit import Chem
 from rdkit.Chem import PandasTools
 import pickle
 
+from sqlalchemy import exc
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA as skl_PCA
@@ -139,15 +140,17 @@ def QSAR_build():
     alg_selection = request.form['algorithm-selection'].strip()
 
     name = f'{dataset_selection}-{desc_selection}-{alg_selection}'
-
-    current_user.launch_task('build_qsar',
-                             f'Building QSAR Model on {name}',
-                             current_user.id,
-                             dataset_selection,
-                             desc_selection,
-                             alg_selection
-                             )
-    db.session.commit()
+    try:
+        current_user.launch_task('build_qsar',
+                                 f'Building QSAR Model on {name}',
+                                 current_user.id,
+                                 dataset_selection,
+                                 desc_selection,
+                                 alg_selection
+                                 )
+        db.session.commit()
+    except exc.OperationalError as err:
+        flash("Failed to submit model, please try again", 'error')
 
     return redirect(url_for('cheminf.QSAR_build'))
 
