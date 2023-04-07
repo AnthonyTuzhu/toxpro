@@ -11,6 +11,7 @@ import plotly.express as px
 import json, os, ntpath
 
 from app.db_models import User, Dataset, Chemical, db
+import app.sql_db as sql_db
 from flask_login import current_user, login_required
 from sqlalchemy import exc
 import pandas as pd
@@ -199,24 +200,54 @@ def toxdata():
     """
     import numpy as np
 
-    pca = pd.DataFrame(
-        {
-            'PC1': np.random.random(size=(100, )),
-            'PC2': np.random.random(size=(100,)),
-            'PC3': np.random.random(size=(100,)),
-        }
-    )
+    masterdb = sql_db.get_master()
 
-    fig = px.scatter_3d(pca,
-                     x='PC1',
-                     y='PC2',
-                     z='PC3')
+    PCA_DF = sql_db.make_query('select * from chemical_space').rename(
+        columns={'n_actives': 'Active Assays', 'n_aids': 'Tested Assays'})
+
+    fig = plotly.graph_objs.Figure(data=[
+        plotly.graph_objs.Scatter(
+            x=PCA_DF["PCA1"],
+            y=PCA_DF["PCA2"],
+            mode="markers",
+            marker=dict(
+                # colorscale='Blackbody',
+                # color=np.log10(PCA_DF["Active Assays"]+1),
+                #
+                # colorbar={"title": "Active<br>Assays"},
+                line={"color": "#444"},
+                reversescale=True,
+                # size=np.log10(PCA_DF["Tested Assays"] + 1),
+                # sizeref=0.3,
+                # sizemin=1,
+                # sizemode="diameter",
+                opacity=0.8,
+            )
+        )
+    ])
 
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
     # add code for bar plot
 
-    fig2 = None
+    N_LD50 = masterdb['LD50-ID'].notnull().sum()
+    N_hep = masterdb['Hepatotoxicity-ID'].notnull().sum()
+    N_dart = masterdb['DART-ID'].notnull().sum()
+    N_BBB = masterdb['BBB-ID'].notnull().sum()
+    N_BCRP = masterdb['BCRP-ID'].notnull().sum()
+    N_Bioavailability = masterdb['Bioavailability-ID'].notnull().sum()
+    N_BSEP = masterdb['BSEP-ID'].notnull().sum()
+    N_Drugbank = masterdb['Drugbank-ID'].notnull().sum()
+    N_Estrogen = masterdb['Estrogen-ID'].notnull().sum()
+    N_FM = masterdb['FM-ID'].notnull().sum()
+    N_MDR1 = masterdb['MDR1-ID'].notnull().sum()
+
+    fig2 = px.bar(
+    y=[N_LD50, N_hep, N_dart, N_BBB, N_BCRP, N_Bioavailability, N_BSEP, N_Drugbank, N_FM, N_Estrogen, N_MDR1],
+    x=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+       'MDR1'],
+    labels={'x': 'Endpoint', 'y': "Number of Compounds"}
+    )
 
     bar_plot = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
 

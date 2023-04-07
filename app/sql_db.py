@@ -10,14 +10,14 @@ from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.Chem.Draw import IPythonConsole
 from rdkit.Chem import rdDepictor
 from rdkit.Chem import rdFMCS
-import chem, time
+import time
 
 
-import config
+import app.config as config
 import requests
 from typing import List
-import main
-import chem
+import app.main as main
+import app.chem as chem
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import glob, os, ntpath

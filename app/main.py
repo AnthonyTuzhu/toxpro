@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import PandasTools
-import config, os
+import app.config as config
+import os
 import glob, ntpath
 
 DATA_DIR = config.Config.DATA_DIR
