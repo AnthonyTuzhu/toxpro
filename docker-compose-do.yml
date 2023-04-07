@@ -23,7 +23,7 @@ services:
         tty: true
 
     worker:
-        image: toxpro:lastest
+        build: .
         env_file:
             - docker-environment-do.env
         depends_on:
