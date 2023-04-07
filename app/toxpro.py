@@ -207,7 +207,7 @@ def toxdata():
     fig = px.scatter_3d(
             x=PCA_DF["PCA1"],
             y=PCA_DF["PCA2"],
-            z=PCA_DF["PCA3"],
+            z=PCA_DF["PCA3"], size_max=6
             )
 
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
