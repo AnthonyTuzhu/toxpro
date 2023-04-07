@@ -16,6 +16,29 @@
           </div>
         </div>
 
+    <div class="row">
+          <div class="col-sm-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+
+                  <h3>Current Databases</h3>
+                  <form action="{{ url_for('toxpro.download_database') }}" method="post" enctype="multipart/form-data">
+                  <label for="database-selection">Select database:</label>
+                  <select class="form-control" name="database-selection">
+                    {% for database in current_dbs %}
+                        <option value="{{ database }}"> {{ database }}</option>
+                    {% endfor %}
+                  </select>
+
+                  <input type="submit" style="color: white;"
+                         class="btn btn-primary btn-padding"
+                         value="Download database" onclick="loading()">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="row">
           <div class="col-6">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">

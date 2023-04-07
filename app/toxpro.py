@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app, send_file, Response
 )
 from werkzeug.utils import secure_filename
 
@@ -11,7 +11,7 @@ import plotly.express as px
 import json, os, ntpath
 
 from app.db_models import User, Dataset, Chemical, db
-import app.sql_db as sql_db
+import app.master_db as master_db
 from flask_login import current_user, login_required
 from sqlalchemy import exc
 import pandas as pd
@@ -200,10 +200,9 @@ def toxdata():
     """
     import numpy as np
 
-    masterdb = sql_db.get_master()
+    masterdb = master_db.get_master()
 
-    PCA_DF = sql_db.make_query('select * from chemical_space').rename(
-        columns={'n_actives': 'Active Assays', 'n_aids': 'Tested Assays'})
+    PCA_DF = master_db.make_query('select * from chemical_space')
 
     fig = plotly.graph_objs.Figure(data=[
         plotly.graph_objs.Scatter(
@@ -211,16 +210,8 @@ def toxdata():
             y=PCA_DF["PCA2"],
             mode="markers",
             marker=dict(
-                # colorscale='Blackbody',
-                # color=np.log10(PCA_DF["Active Assays"]+1),
-                #
-                # colorbar={"title": "Active<br>Assays"},
                 line={"color": "#444"},
                 reversescale=True,
-                # size=np.log10(PCA_DF["Tested Assays"] + 1),
-                # sizeref=0.3,
-                # sizemin=1,
-                # sizemode="diameter",
                 opacity=0.8,
             )
         )
@@ -251,6 +242,25 @@ def toxdata():
 
     bar_plot = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
 
+
     return render_template('toxpro/toxdata.html',
+                           current_dbs=master_db.CURRENT_DATABASES,
                            bar_plot=bar_plot,
                            pca_plot=pca_plot)
+
+@bp.route('/download_database', methods=['POST'])
+@login_required
+def download_database():
+    database_selection = request.form['database-selection'].strip()
+    db = master_db.get_database(database_selection)
+
+    import io
+    mem = io.BytesIO()
+    mem.write(db.to_csv().encode())
+    mem.seek(0)
+    return send_file(
+        mem,
+        as_attachment=True,
+        download_name=f"{database_selection}.csv",
+        mimetype="text/plain",
+    )
