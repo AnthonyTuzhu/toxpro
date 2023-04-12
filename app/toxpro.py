@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app, send_file, Response
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app,
+    send_file, Response
 )
 from werkzeug.utils import secure_filename
 
@@ -15,6 +16,7 @@ import app.master_db as master_db
 from flask_login import current_user, login_required
 from sqlalchemy import exc
 import pandas as pd
+from plotly.graph_objs import *
 
 bp = Blueprint('toxpro', __name__)
 
@@ -51,6 +53,7 @@ def contact():
 
     """
     return render_template('toxpro/contact.html')
+
 
 @bp.route('/datasets', methods=['GET'])
 @login_required
@@ -133,11 +136,10 @@ def upload_dataset():
                     chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
                     dataset.chemicals.append(chem)
 
-
             db.session.add(dataset)
             db.session.commit()
 
-            num_chemicals =len(list(dataset.chemicals))
+            num_chemicals = len(list(dataset.chemicals))
             flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
             return redirect(url_for('toxpro.datasets'))
         else:
@@ -205,10 +207,23 @@ def toxdata():
     PCA_DF = master_db.make_query('select * from chemical_space')
 
     fig = px.scatter_3d(
-            x=PCA_DF["PCA1"],
-            y=PCA_DF["PCA2"],
-            z=PCA_DF["PCA3"], size_max=6
-            )
+        x=PCA_DF["PCA1"],
+        y=PCA_DF["PCA2"],
+        z=PCA_DF["PCA3"], size_max=6, title='Principal Component Analysis of all compounds',
+        width=920, height=800,
+        color_discrete_map={
+            1: "rgba(255, 0, 0, 0.5)",
+            0: "rgba(0, 0, 255, 0.5)"
+        }
+    )
+    fig.update_traces(marker_size=1)
+    fig.update_layout(scene=Scene(
+        xaxis=XAxis(title='Principal Component 1'),
+        yaxis=YAxis(title='Principal Component 2'),
+        zaxis=ZAxis(title='Principal Component 3')))
+    fig.update_layout(template='plotly_white',
+                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
+                      )
 
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
@@ -225,21 +240,32 @@ def toxdata():
     N_Estrogen = masterdb['Estrogen-ID'].notnull().sum()
     N_FM = masterdb['FM-ID'].notnull().sum()
     N_MDR1 = masterdb['MDR1-ID'].notnull().sum()
+    endpoints = ['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+                 'MDR1']
 
     fig2 = px.bar(
-    y=[N_LD50, N_hep, N_dart, N_BBB, N_BCRP, N_Bioavailability, N_BSEP, N_Drugbank, N_FM, N_Estrogen, N_MDR1],
-    x=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
-       'MDR1'],
-    labels={'x': 'Endpoint', 'y': "Number of Compounds"}
+        y=[N_LD50, N_hep, N_dart, N_BBB, N_BCRP, N_Bioavailability, N_BSEP, N_Drugbank, N_FM, N_Estrogen, N_MDR1],
+        x=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+           'MDR1'],
+        color=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+           'MDR1'],
+        labels={'x': 'Endpoint', 'y': "Number of Compounds"},
+        title='Size of datasets',
+        height=800,
     )
+    fig2.update_layout(xaxis={'categoryorder': 'total ascending'})
+    fig2.update_layout(showlegend=False)
+    fig2.update_layout(template='plotly_white',
+                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
+                      )
 
     bar_plot = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-
 
     return render_template('toxpro/toxdata.html',
                            current_dbs=master_db.CURRENT_DATABASES,
                            bar_plot=bar_plot,
                            pca_plot=pca_plot)
+
 
 @bp.route('/download_database', methods=['POST'])
 @login_required
