@@ -205,16 +205,17 @@ def toxdata():
     masterdb = master_db.get_master()
 
     PCA_DF = master_db.make_query('select * from chemical_space')
+    PCA_DF['Total Appearance in all datasets'] = PCA_DF['LD50-ID']+ PCA_DF['Hepatotoxicity-ID'] +PCA_DF['DART-ID'] +\
+                                 PCA_DF['BBB-ID'] + PCA_DF['BCRP-ID'] +PCA_DF['Bioavailability-ID']+\
+                                 PCA_DF['BSEP-ID'] +PCA_DF['Drugbank-ID'] +PCA_DF['Estrogen-ID'] +\
+                                 PCA_DF['FM-ID'] + PCA_DF['MDR1-ID']
 
-    fig = px.scatter_3d(
-        x=PCA_DF["PCA1"],
-        y=PCA_DF["PCA2"],
-        z=PCA_DF["PCA3"], size_max=6, title='Principal Component Analysis of all compounds',
+    fig = px.scatter_3d(PCA_DF,
+        x="PCA1",
+        y="PCA2",
+        z="PCA3", size_max=6, title='Principal Component Analysis of all compounds',
+        color= 'Total Appearance in all datasets', #color_continuous_scale='plasma',
         width=920, height=800,
-        color_discrete_map={
-            1: "rgba(255, 0, 0, 0.5)",
-            0: "rgba(0, 0, 255, 0.5)"
-        }
     )
     fig.update_traces(marker_size=1)
     fig.update_layout(scene=Scene(
