@@ -214,7 +214,7 @@ def toxdata():
         y="PCA2",
         z="PCA3", size_max=6, title='Principal Component Analysis of all compounds',
         color= 'Total Appearance in all datasets', #color_continuous_scale='plasma',
-        width=920, height=800,
+        width=800, height=600,
     )
     fig.update_traces(marker_size=1)
     fig.update_layout(scene=Scene(
@@ -251,7 +251,7 @@ def toxdata():
            'MDR1'],
         labels={'x': 'Endpoint', 'y': "Number of Compounds"},
         title='Size of datasets',
-        height=800,
+        height=400,
     )
     fig2.update_layout(xaxis={'categoryorder': 'total ascending'})
     fig2.update_layout(showlegend=False)
