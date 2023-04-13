@@ -198,7 +198,6 @@ def assayProfile():
 def toxdata():
     """
     displays the homepage
-
     """
     import numpy as np
 
