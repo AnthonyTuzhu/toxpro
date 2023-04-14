@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div>
+
+    <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+                <div class="card-body">
+                    <h3>
+                        Chemical curator
+                    </h3>
+                        <p>Proper chemical curation is a crucial step in Quantitative Structure-Activity Relationship
+                            development.</p>
+
+
+                </div>
+            </div>
+          </div>
+    </div>
+
+
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+
+
+                  {% if not user_datasets %}
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <p> No datasets.  Please upload a dataset to build a QSAR model. </p>
+                        </div>
+                    </div>
+                </div>
+                  {% else %}
+
+                <div class="card-body">
+                <div class="row">
+
+                    <div class="col-lg-12">
+
+                    </div>
+                </div>
+
+
+
+              <form action="{{ url_for('cheminf.curator') }}" method="post" enctype="multipart/form-data">
+                <div class="row text-muted">
+
+                    <div class="col-lg-4">
+                        <h6>Select Dataset: </h6>
+                        <select class="form-control" name="dataset-selection">
+                        {% for dataset in user_datasets %}
+                            <option value="{{ dataset.dataset_name }}"> {{ dataset.dataset_name }}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <h6>Select how to handle duplicates: </h6>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="duplicate-selection" value="higher" checked>
+                            <label class="form-check-label" for="radioECFP6">Take highest activity</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="duplicate-selection" value="lower">
+                            <label class="form-check-label" for="radioFCFP6">Take lowest activity</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="duplicate-selection" value="remove">
+                            <label class="form-check-label" for="radioRdkit">Remove all</label>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="row">
+                    <div class="col-12 pt-4 pb-4">
+                        <center>
+                        <input type="submit" style="color: white;"
+                         class="btn btn-primary "
+                         value="Curate" onclick="loading()">
+                        </center>
+                    </div>
+
+                </div>
+               </form>
+
+
+              {% if user.get_tasks_in_progress() %}
+              <div class="row pt-4">
+              <h3>Jobs</h3>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {%  for task in user.get_tasks_in_progress() %}
+                        <tr>
+                            <td>{{ task.id }}</td>
+                            <td>{{ task.description }}</td>
+                            <td>{{ task.get_progress() }}</td>
+                        </tr>
+                    {%  endfor %}
+                    </tbody>
+                </table>
+              </div>
+              {% endif %}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if user.has_qsar %}
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+                <div class="card-body">
+                <div class="row pt-4">
+                <h3>Trained Models</h3>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                            <th>F1-Score</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>Specificity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for dataset in user.datasets %}
+                        {% for qsar_model in dataset.qsar_models %}
+                            {% if qsar_model.cvresults %}
+                        <tr>
+                            <td>{{ qsar_model.name }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.accuracy) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.f1_score) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.precision) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.recall) }}</td>
+                            <td>{{ '{:.2%}'.format(qsar_model.cvresults.specificity) }}</td>
+                        </tr>
+                            {% else %}
+                        <tr>
+                            <td>{{ qsar_model.name }}</td>
+                            <td> NA </td>
+                            <td> NA </td>
+                            <td> NA </td>
+                            <td> NA </td>
+                            <td> NA </td>
+                        </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
+

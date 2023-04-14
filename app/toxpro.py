@@ -168,15 +168,6 @@ def remove_dataset():
     return redirect(url_for('toxpro.datasets'))
 
 
-@bp.route('/curator', methods=['GET'])
-@login_required
-def curator():
-    """
-    displays the homepage
-
-    """
-
-    return render_template('toxpro/curator.html')
 
 
 @bp.route('/assayProfile', methods=['GET'])
