@@ -23,7 +23,6 @@ logs/
 instance/
 instance/toxpro.sqlite
 
-Dockerfile
 
 run_docker*.sh
 
