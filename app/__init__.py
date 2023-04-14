@@ -56,7 +56,7 @@ def create_app(test_config=None):
     app.redis = Redis('toxpro-redis-1', 6379)
     app.task_queue = rq.Queue('toxpro-tasks', connection=app.redis)
 
-    from .email import mail
+    from .emails import mail
     mail.init_app(app)
 
     from .errors import not_found, internal_error

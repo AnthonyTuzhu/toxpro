@@ -53,15 +53,15 @@ def curator():
     dup_selection = request.form['duplicate-selection'].strip()
 
 
-    # try:
-    #     current_user.launch_task('curate_chems',
-    #                              f'Curating {name} chemicals',
-    #                              current_user.id,
-    #                              dataset_selection,
-    #                              )
-    #     db.session.commit()
-    # except exc.OperationalError as err:
-    #     flash("Failed to submit curation job, please try again", 'error')
+    try:
+        current_user.launch_task('curate_chems',
+                                 f'Curating {dataset_selection} chemicals',
+                                 current_user.id,
+                                 dataset_selection,
+                                 )
+        db.session.commit()
+    except exc.OperationalError as err:
+        flash("Failed to submit curation job, please try again", 'error')
 
     flash(f"{dataset_selection}, {dup_selection}", 'error')
 

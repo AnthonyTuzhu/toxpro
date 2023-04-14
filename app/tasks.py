@@ -2,6 +2,7 @@
 # here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
 from app import create_app
 from app.db_models import db, Dataset, Chemical, QSARModel, Task, CVResults
+from app.curator.curator import Curator
 from app import chem_io
 from app import machine_learning as ml
 
@@ -103,6 +104,37 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
     db.session.commit()
 
 
+def curate_chems(user_id, dataset_name):
+    """ function that curates a set of chemicals submitted to redis """
+
+    job = get_current_job()
+    job.meta['progress'] = 'Curating...'
+    job.save_meta()
+    query_statement = db.session.query(Chemical).join(Dataset,
+                                                      Dataset.id == Chemical.dataset_id) \
+        .filter(Dataset.dataset_name == dataset_name) \
+        .filter(Dataset.user_id == user_id).statement
+    df = pd.read_sql(query_statement, db.session.connection())
+
+    dataset = Dataset.query.filter_by(dataset_name=dataset_name, user_id=user_id).first()
+
+    curator = Curator(df)
+    curator.curate()
+    print()
+    # job done
+    # think about putting this into its own helper function
+    # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+    job.meta['progress'] = 'Complete'
+    job.save_meta()
+    task = Task.query.get(job.get_id())
+    task.complete = True
+    task.time_completed = datetime.datetime.now(timezone.utc)
+
+
+    #db.session.add(cv_results)
+    #db.session.commit()
+
+
 def example(seconds):
     job = get_current_job()
     print('Starting task')
@@ -114,3 +146,6 @@ def example(seconds):
     job.meta['progress'] = 100
     job.save_meta()
     print('Task completed')
+
+if __name__ == '__main__':
+    curate_chems(1, "AMES_curated")
