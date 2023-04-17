@@ -1,5 +1,6 @@
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app
+    Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app,
+    send_file, Response
 )
 from werkzeug.utils import secure_filename
 
@@ -11,9 +12,11 @@ import plotly.express as px
 import json, os, ntpath
 
 from app.db_models import User, Dataset, Chemical, db
+import app.master_db as master_db
 from flask_login import current_user, login_required
 from sqlalchemy import exc
 import pandas as pd
+from plotly.graph_objs import *
 
 bp = Blueprint('toxpro', __name__)
 
@@ -50,6 +53,7 @@ def contact():
 
     """
     return render_template('toxpro/contact.html')
+
 
 @bp.route('/datasets', methods=['GET'])
 @login_required
@@ -132,11 +136,10 @@ def upload_dataset():
                     chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
                     dataset.chemicals.append(chem)
 
-
             db.session.add(dataset)
             db.session.commit()
 
-            num_chemicals =len(list(dataset.chemicals))
+            num_chemicals = len(list(dataset.chemicals))
             flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
             return redirect(url_for('toxpro.datasets'))
         else:
@@ -186,7 +189,88 @@ def assayProfile():
 def toxdata():
     """
     displays the homepage
-
     """
+    import numpy as np
 
-    return render_template('toxpro/toxdata.html')
+    masterdb = master_db.get_master()
+
+    PCA_DF = master_db.make_query('select * from chemical_space')
+    PCA_DF['Total Appearance in all datasets'] = PCA_DF['LD50-ID']+ PCA_DF['Hepatotoxicity-ID'] +PCA_DF['DART-ID'] +\
+                                 PCA_DF['BBB-ID'] + PCA_DF['BCRP-ID'] +PCA_DF['Bioavailability-ID']+\
+                                 PCA_DF['BSEP-ID'] +PCA_DF['Drugbank-ID'] +PCA_DF['Estrogen-ID'] +\
+                                 PCA_DF['FM-ID'] + PCA_DF['MDR1-ID']
+
+    fig = px.scatter_3d(PCA_DF,
+        x="PCA1",
+        y="PCA2",
+        z="PCA3", size_max=6, title='Principal Component Analysis of all compounds',
+        color= 'Total Appearance in all datasets', #color_continuous_scale='plasma',
+        width=800, height=600,
+    )
+    fig.update_traces(marker_size=1)
+    fig.update_layout(scene=Scene(
+        xaxis=XAxis(title='Principal Component 1'),
+        yaxis=YAxis(title='Principal Component 2'),
+        zaxis=ZAxis(title='Principal Component 3')))
+    fig.update_layout(template='plotly_white',
+                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
+                      )
+
+    pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+    # add code for bar plot
+
+    N_LD50 = masterdb['LD50-ID'].notnull().sum()
+    N_hep = masterdb['Hepatotoxicity-ID'].notnull().sum()
+    N_dart = masterdb['DART-ID'].notnull().sum()
+    N_BBB = masterdb['BBB-ID'].notnull().sum()
+    N_BCRP = masterdb['BCRP-ID'].notnull().sum()
+    N_Bioavailability = masterdb['Bioavailability-ID'].notnull().sum()
+    N_BSEP = masterdb['BSEP-ID'].notnull().sum()
+    N_Drugbank = masterdb['Drugbank-ID'].notnull().sum()
+    N_Estrogen = masterdb['Estrogen-ID'].notnull().sum()
+    N_FM = masterdb['FM-ID'].notnull().sum()
+    N_MDR1 = masterdb['MDR1-ID'].notnull().sum()
+    endpoints = ['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+                 'MDR1']
+
+    fig2 = px.bar(
+        y=[N_LD50, N_hep, N_dart, N_BBB, N_BCRP, N_Bioavailability, N_BSEP, N_Drugbank, N_FM, N_Estrogen, N_MDR1],
+        x=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+           'MDR1'],
+        color=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
+           'MDR1'],
+        labels={'x': 'Endpoint', 'y': "Number of Compounds"},
+        title='Size of datasets',
+        height=400,
+    )
+    fig2.update_layout(xaxis={'categoryorder': 'total ascending'})
+    fig2.update_layout(showlegend=False)
+    fig2.update_layout(template='plotly_white',
+                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
+                      )
+
+    bar_plot = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return render_template('toxpro/toxdata.html',
+                           current_dbs=master_db.CURRENT_DATABASES,
+                           bar_plot=bar_plot,
+                           pca_plot=pca_plot)
+
+
+@bp.route('/download_database', methods=['POST'])
+@login_required
+def download_database():
+    database_selection = request.form['database-selection'].strip()
+    db = master_db.get_database(database_selection)
+
+    import io
+    mem = io.BytesIO()
+    mem.write(db.to_csv().encode())
+    mem.seek(0)
+    return send_file(
+        mem,
+        as_attachment=True,
+        download_name=f"{database_selection}.csv",
+        mimetype="text/plain",
+    )

@@ -8,15 +8,62 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-
-                  <p class="card-text">We're sorry this function has not yet been implemented.</p>
+                  <h3>ToxVerse Databases</h3>
+                  <p>This page provides an overview of ToxVerse datasets and their statistics.</p>
 
               </div>
             </div>
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                        <div id='chart' class='chart'”></div>
+              </div>
+            </div>
+          </div>
 
-    </div>
+        <div class="col-6">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                        <div id='bar-chart' class='chart'”></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+
+                  <h3>Select database to download</h3>
+                  <form action="{{ url_for('toxpro.download_database') }}" method="post" enctype="multipart/form-data">
+                  <label for="database-selection">Select database:</label>
+                  <select class="form-control" name="database-selection">
+                    {% for database in current_dbs %}
+                        <option value="{{ database }}"> {{ database }}</option>
+                    {% endfor %}
+                  </select>
+
+                  <input type="submit" style="color: white;"
+                         class="btn btn-primary btn-padding"
+                         value="Download database" onclick="loading()">
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+    <script type='text/javascript'>
+      var pcaPlot = {{pca_plot | safe}};
+      Plotly.plot('chart', pcaPlot, {});
+
+      var barChart = {{bar_plot | safe}};
+      Plotly.plot('bar-chart', barChart, {});
+    </script>
 
 {% endblock %}
