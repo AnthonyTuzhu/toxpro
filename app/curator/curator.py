@@ -71,16 +71,17 @@ class Curator:
         self.o_df = self.o_df.drop_duplicates(subset='new_inchi', keep=keep)
 
 
-    def curate(self):
+    def curate(self, duplicates):
         self.prep_frame()
         self.check_cmps()
         self.standardize()
         self.get_parents()
-        self.handle_duplicates(how='higher')
+        self.handle_duplicates(how=duplicates)
 
         self.new_df = self.o_df.copy()
         self.new_df['inchi'] = self.new_df.new_inchi
         self.new_df = self.new_df[['activity', 'inchi', 'compound_id']]
+
 
 
 
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 
 
     curator = Curator(df)
-    curator.curate()
+    curator.curate(duplicates='higher')
     print()
     print()
 

@@ -51,19 +51,23 @@ def curator():
 
     dataset_selection = request.form['dataset-selection'].strip()
     dup_selection = request.form['duplicate-selection'].strip()
-
+    create_or_replace = request.form['create-or-replace'].strip()
+    if create_or_replace == 'replace':
+        replace = True
+    else:
+        replace = False
 
     try:
         current_user.launch_task('curate_chems',
                                  f'Curating {dataset_selection} chemicals',
                                  current_user.id,
                                  dataset_selection,
+                                 dup_selection,
+                                 replace
                                  )
         db.session.commit()
     except exc.OperationalError as err:
         flash("Failed to submit curation job, please try again", 'error')
-
-    flash(f"{dataset_selection}, {dup_selection}", 'error')
 
     return redirect(url_for('cheminf.curator'))
 

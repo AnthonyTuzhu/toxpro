@@ -104,7 +104,7 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
     db.session.commit()
 
 
-def curate_chems(user_id, dataset_name):
+def curate_chems(user_id, dataset_name, duplicate_selection, replace=False):
     """ function that curates a set of chemicals submitted to redis """
 
     job = get_current_job()
@@ -119,8 +119,48 @@ def curate_chems(user_id, dataset_name):
     dataset = Dataset.query.filter_by(dataset_name=dataset_name, user_id=user_id).first()
 
     curator = Curator(df)
-    curator.curate()
-    print()
+    curator.curate(duplicates=duplicate_selection)
+
+    new_df = curator.new_df.copy()
+
+    if not replace:
+
+        job.meta['progress'] = 'Adding dataset...'
+        job.save_meta()
+
+        new_dataset = Dataset(dataset_name=dataset.dataset_name + '_curated', user_id=user_id)
+        db.session.add(new_dataset)
+        db.session.commit()
+
+        for i, row in new_df .iterrows():
+            activity = row['activity']
+            cmp_id = row['compound_id']
+            inchi = row['inchi']
+
+            chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
+            new_dataset.chemicals.append(chem)
+
+        db.session.add(new_dataset)
+        db.session.commit()
+    else:
+        job.meta['progress'] = 'Replacing dataset...'
+        job.save_meta()
+        # remove all previous chemicals
+        Chemical.query.filter_by(dataset_id=dataset.id).delete()
+
+        db.session.commit()
+
+        for i, row in new_df .iterrows():
+            activity = row['activity']
+            cmp_id = row['compound_id']
+            inchi = row['inchi']
+
+            chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
+            dataset.chemicals.append(chem)
+
+        db.session.add(dataset)
+        db.session.commit()
+
     # job done
     # think about putting this into its own helper function
     # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
