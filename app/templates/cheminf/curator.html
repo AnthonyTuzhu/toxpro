@@ -11,7 +11,16 @@
                         Chemical curator
                     </h3>
                         <p>Proper chemical curation is a crucial step in Quantitative Structure-Activity Relationship
-                            development.</p>
+                            development.  This module cleans chemical structures and prepares them by using the following steps:
+
+                            <ol>
+                              <li>Check and clean chemical structures.</li>
+                              <li>Standardize chemical structure representation (e.g, updating valencies, removing charges, etc.).</li>
+                              <li>Strip salts and remove mixtures by keeping the largest organic component.</li>
+                              <li>Merge or remove duplicated structures.</li>
+                            </ol>
+
+                        </p>
 
 
                 </div>
@@ -61,11 +70,11 @@
                         <h6>Select how to handle duplicates: </h6>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="duplicate-selection" value="higher" checked>
-                            <label class="form-check-label" for="radioECFP6">Take highest activity</label>
+                            <label class="form-check-label" for="radioECFP6">Merge and take <strong>highest</strong> activity</label>
                         </div>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="duplicate-selection" value="lower">
-                            <label class="form-check-label" for="radioFCFP6">Take lowest activity</label>
+                            <label class="form-check-label" for="radioFCFP6">Merge and take <strong>lowest</strong> activity</label>
                         </div>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="duplicate-selection" value="remove">
