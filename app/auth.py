@@ -13,7 +13,7 @@ from flask_login import login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 from sqlalchemy import exc
-from app.email import send_password_reset_email, send_registration_confirmation_email
+from app.emails import send_password_reset_email, send_registration_confirmation_email
 
 #from app.db import get_db
 from app.db_models import User, db

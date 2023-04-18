@@ -34,6 +34,44 @@ from app.db_models import User, db
 
 bp = Blueprint('cheminf', __name__, url_prefix='/cheminf')
 
+
+@bp.route('/curator', methods=['GET', 'POST'])
+@login_required
+def curator():
+    """
+    displays the homepage
+
+    """
+    from app.curator.curator import Curator
+
+    current_user.has_qsar = any(d.qsar_models for d in current_user.datasets)
+    if request.method == 'GET':
+        return render_template('cheminf/curator.html', user_datasets=list(current_user.datasets), user=current_user)
+
+
+    dataset_selection = request.form['dataset-selection'].strip()
+    dup_selection = request.form['duplicate-selection'].strip()
+    create_or_replace = request.form['create-or-replace'].strip()
+    if create_or_replace == 'replace':
+        replace = True
+    else:
+        replace = False
+
+    try:
+        current_user.launch_task('curate_chems',
+                                 f'Curating {dataset_selection} chemicals',
+                                 current_user.id,
+                                 dataset_selection,
+                                 dup_selection,
+                                 replace
+                                 )
+        db.session.commit()
+    except exc.OperationalError as err:
+        flash("Failed to submit curation job, please try again", 'error')
+
+    return redirect(url_for('cheminf.curator'))
+
+
 @bp.route('/PCA', methods=('GET', 'POST'))
 @login_required
 def PCA():
