@@ -105,7 +105,7 @@ def login():
         elif not check_password_hash(user.password_hash, password):
             error = 'Incorrect password.'
 
-        if not user.confirmed:
+        if (user is not None) and not user.confirmed:
             error = 'Registration email not confirmed.  Please check your email ' \
                     'or send another email confirmation below.  '
 
