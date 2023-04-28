@@ -23,9 +23,8 @@
     <script type=text/javascript>
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
+    <script src="{{ url_for('static', filename='js/toxpro.js') }}"></script>
     <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="../static/js/requests.js"></script>
-    <script src="../static/js/ciipro.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
     <script src="http://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>

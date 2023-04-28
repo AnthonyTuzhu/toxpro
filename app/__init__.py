@@ -52,6 +52,9 @@ def create_app(test_config=None):
     app.register_blueprint(toxpro.bp)
     app.add_url_rule('/', endpoint='index')
 
+    from . import database_api
+    app.register_blueprint(database_api.bp)
+
     #app.redis = Redis.from_url('redis://toxpro-redis-1:6379')
     app.redis = Redis('toxpro-redis-1', 6379)
     app.task_queue = rq.Queue('toxpro-tasks', connection=app.redis)

@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/datasets.css') }}">
-<script src="../static/js/datasets.js"></script>
-<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+
 <div id="divLoading">
 
 </div>
@@ -81,6 +79,11 @@
                         <option value="{{ dataset.dataset_name }}"> {{ dataset.dataset_name }}</option>
                     {% endfor %}
                   </select>
+
+
+                      <h6 id="num_acts", style="padding-top: 2em">Num Actives:  <span id="num_act_text" class="prof-attr text-muted"></span></h6>
+                      <h6 id="num_inacts">Num Inactives:  <span id="num_inact_text" class="prof-attr text-muted"></span></h6>
+
                   <input type="submit" style="color: white;"
                          class="btn btn-danger btn-padding"
                          value="Remove dataset" onclick="loading()">
@@ -99,16 +102,9 @@
 <script>
 
 updateDataset();
-var e = document.getElementById("dataset-selection");
+var e = $('select[name="dataset-selection"]')[0];
 e.addEventListener("change", function() {
     updateDataset();
-
-});
-
-
-$('tr').dblclick(function() {
-    var dataset = $(this).children("td:first-child").text();
-    addInhouseDataset(dataset);
 
 });
 
