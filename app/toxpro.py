@@ -160,9 +160,31 @@ def remove_dataset():
     """
 
     dataset_selection = request.form['dataset-selection'].strip()
+    do_what_with_dataset =  request.form['action']
+
+    # there are two buttons one to download
+    # and one to remove.
+    if do_what_with_dataset == 'Download dataset':
+        query_statement = db.session.query(Chemical).join(Dataset,
+                                                          Dataset.id == Chemical.dataset_id) \
+            .filter(Dataset.dataset_name == dataset_selection) \
+            .filter(Dataset.user_id == current_user.id).statement
+
+        df = pd.read_sql(query_statement, db.session.connection())
+
+        import io
+        mem = io.BytesIO()
+        mem.write(df.to_csv().encode())
+        mem.seek(0)
+        return send_file(
+            mem,
+            as_attachment=True,
+            download_name=f"{dataset_selection}.csv",
+            mimetype="text/plain",
+        )
+
 
     dataset = Dataset.query.filter_by(dataset_name=dataset_selection, user_id=current_user.id).first()
-    print(dataset)
     db.session.delete(dataset)
     db.session.commit()
     message = f"Removed {dataset_selection}"

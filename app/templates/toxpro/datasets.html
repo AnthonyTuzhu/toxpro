@@ -86,7 +86,12 @@
 
                   <input type="submit" style="color: white;"
                          class="btn btn-danger btn-padding"
-                         value="Remove dataset" onclick="loading()">
+                         name="action"
+                         value="Remove dataset" onclick="return confirm('Are you sure you want to delete this dataset?')">
+                  <input type="submit" style="color: white;"
+                         name="action"
+                         class="btn btn-success btn-padding"
+                         value="Download dataset">
                 </form>
 
                 </div>
