@@ -158,10 +158,10 @@ table.dataTable tbody tr {
   background-color: #ffffff;
 }
 
-.active {
+.cmp-active {
   color:  rgba(255, 0, 0, 0.5)
 }
 
-.inactive {
+.cmp-inactive {
   color:  rgba(0, 0, 255, 0.5)
 }
