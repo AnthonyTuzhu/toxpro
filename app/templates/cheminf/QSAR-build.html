@@ -108,27 +108,8 @@
 
 
               {% if user.get_tasks_in_progress() %}
-              <div class="row pt-4">
-              <h3>Jobs</h3>
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Task</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {%  for task in user.get_tasks_in_progress() %}
-                        <tr>
-                            <td>{{ task.id }}</td>
-                            <td>{{ task.description }}</td>
-                            <td>{{ task.get_progress() }}</td>
-                        </tr>
-                    {%  endfor %}
-                    </tbody>
-                </table>
-              </div>
+                {% include '_tasks.html' %}
+
               {% endif %}
               </div>
               {% endif %}
