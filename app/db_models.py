@@ -24,6 +24,7 @@ import rq
 import jwt
 from time import time
 
+
 from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
@@ -136,7 +137,8 @@ class Chemical(db.Model):
 
     def get_svg(self):
         mol = Chem.MolFromInchi(self.inchi)
-        d2d = rdMolDraw2D.MolDraw2DSVG(250, 200)
+        d2d = rdMolDraw2D.MolDraw2DSVG(current_app.config['SVG_DISPLAY_WIDTH'],
+                                       current_app.config['SVG_DISPLAY_HEIGHT'])
         d2d.DrawMolecule(mol)
         d2d.FinishDrawing()
         return d2d.GetDrawingText()
