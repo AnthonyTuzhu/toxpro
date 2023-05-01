@@ -34,3 +34,17 @@ def get_dataset_overview(dataset_selection):
         'inactives': int(inactives)
     }
     return jsonify(results=data)
+
+@bp.route('/dataset-data/<dataset_selection>')
+def get_dataset_data(dataset_selection):
+
+    dataset_selection = request.args.get("dataset-selection")
+    print(dataset_selection)
+
+    dataset = Dataset.query.filter(Dataset.dataset_name==dataset_selection) \
+                                   .filter(Dataset.user_id==current_user.id).one()
+
+    return {
+        "data": [chemical.to_dict() for chemical in dataset.get_chemicals().all()]
+    }
+

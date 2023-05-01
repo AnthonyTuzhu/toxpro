@@ -62,6 +62,7 @@ def datasets():
     displays the homepage
 
     """
+    current_user.datasets[0].get_chemicals()
     return render_template('toxpro/datasets.html', user_datasets=list(current_user.datasets))
 
 
@@ -71,6 +72,13 @@ def upload_dataset():
     """
     uploads a dataset
 
+    For the javascript datatable on the client-side, there is a nice
+    tutorial overview here: https://blog.miguelgrinberg.com/post/beautiful-interactive-tables-for-your-flask-templates/page/0
+
+
+    his basic pagination tutorial is here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ix-pagination
+
+    Both are necessary for the
     """
     sdfile = request.files['compound_file']
     activity_col = request.form['act-id-property'].strip() or 'Activity'

@@ -107,12 +107,23 @@ class Dataset(db.Model):
         db.UniqueConstraint('user_id', 'dataset_name', name='_user_dataset_uc'),
     )
 
+    def get_chemicals(self):
+        return Chemical.query.join(Dataset,
+                              Dataset.id == Chemical.dataset_id).filter(Dataset.id == self.id)
+
 class Chemical(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     inchi = db.Column(db.String)
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
     activity = db.Column(db.Integer)
     compound_id = db.Column(db.String)
+
+    def to_dict(self):
+        return {
+            'Chemical': self.compound_id,
+            'Activity': self.activity,
+            'Structure': self.inchi
+        }
 
 
 class QSARModel(db.Model):

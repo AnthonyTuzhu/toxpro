@@ -36,7 +36,7 @@
 
 
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div class="card shadow p-3 mb-5 bg-white rounded">
               <div class="card-body">
                   <form action="{{ url_for('toxpro.upload_dataset') }}" method="post" enctype="multipart/form-data" name="">
@@ -66,9 +66,10 @@
             </div>
           </div>
 
-        <div class="col-sm-6">
-
         {% if user_datasets %}
+        <div class="col-sm-4">
+
+
             <div class="card shadow p-3 mb-5 bg-white rounded">
               <div class="card-body">
                 <div class="form-group">
@@ -98,13 +99,48 @@
               </div>
             </div>
 
-        {% endif %}
           </div>
+
+          <div class="col-sm-4">
+
+              <table id="data" class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Chemical</th>
+                        <th>Activity</th>
+                        <th>Structure</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+
+          <div>
+        {% endif %}
 
     </div>
 
 </div>
 <script>
+
+
+
+$(document).ready(function () {
+  $('#data').DataTable({
+    ajax: {
+        "url": '/api/dataset-data/AMES_curated',
+        "data": {
+          "dataset-selection": "AMES_curated"
+        },
+    },
+    columns: [
+          {data: 'Chemical'},
+          {data: 'Activity'},
+          {data: 'Structure'},
+        ],
+  });
+});
+
 
 updateDataset();
 var e = $('select[name="dataset-selection"]')[0];
