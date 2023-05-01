@@ -153,3 +153,7 @@ height : 32px;
 margin-left : -16px;
 margin-top : -16px;
 }
+
+table.dataTable tbody tr {
+  background-color: #ffffff;
+}

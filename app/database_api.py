@@ -35,16 +35,38 @@ def get_dataset_overview(dataset_selection):
     }
     return jsonify(results=data)
 
-@bp.route('/dataset-data/<dataset_selection>')
-def get_dataset_data(dataset_selection):
+@bp.route('/dataset-data')
+def get_dataset_data():
 
-    dataset_selection = request.args.get("dataset-selection")
-    print(dataset_selection)
+    dataset_selection = request.args.get("datasetSelection")
+    search = request.args.get('search[value]')
 
-    dataset = Dataset.query.filter(Dataset.dataset_name==dataset_selection) \
-                                   .filter(Dataset.user_id==current_user.id).one()
+
+    query = Dataset.query.filter(Dataset.dataset_name==dataset_selection) \
+                                   .filter(Dataset.user_id==current_user.id) \
+                                   .one().get_chemicals()
+
+
+    total_chemicals = query.count()
+
+    if search:
+        query = query.filter(db.or_(
+            Chemical.compound_id.like(f'%{search}%'),
+            Chemical.activity.like(f'%{search}%')
+        ))
+        print(search)
+    total_filtered = query.count()
+
+
+    # pagination
+    start = request.args.get('start', type=int)
+    length = request.args.get('length', type=int)
+    query = query.offset(start).limit(length)
 
     return {
-        "data": [chemical.to_dict() for chemical in dataset.get_chemicals().all()]
+        "data": [chemical.to_dict(structure_as_svg=True) for chemical in query.all()],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': total_chemicals,
+        'draw': request.args.get('draw', type=int)
     }
 

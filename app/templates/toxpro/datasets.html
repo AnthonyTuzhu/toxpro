@@ -67,7 +67,7 @@
           </div>
 
         {% if user_datasets %}
-        <div class="col-sm-4">
+        <div class="col-sm-8">
 
 
             <div class="card shadow p-3 mb-5 bg-white rounded">
@@ -85,6 +85,18 @@
                       <h6 id="num_acts", style="padding-top: 2em">Num Actives:  <span id="num_act_text" class="prof-attr text-muted"></span></h6>
                       <h6 id="num_inacts">Num Inactives:  <span id="num_inact_text" class="prof-attr text-muted"></span></h6>
 
+                  <table id="data" class="table compact">
+                    <thead>
+                      <tr>
+                        <th>Chemical</th>
+                        <th>Activity</th>
+                        <th>Structure</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
+
                   <input type="submit" style="color: white;"
                          class="btn btn-danger btn-padding"
                          name="action"
@@ -101,21 +113,7 @@
 
           </div>
 
-          <div class="col-sm-4">
 
-              <table id="data" class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Chemical</th>
-                        <th>Activity</th>
-                        <th>Structure</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-
-          <div>
         {% endif %}
 
     </div>
@@ -127,26 +125,27 @@
 
 $(document).ready(function () {
   $('#data').DataTable({
+    serverSide: true,
     ajax: {
-        "url": '/api/dataset-data/AMES_curated',
-        "data": {
-          "dataset-selection": "AMES_curated"
+        "url": '/api/dataset-data',
+        data: function(d) {
+            d.datasetSelection = getDatasetSelection();
         },
     },
     columns: [
-          {data: 'Chemical'},
-          {data: 'Activity'},
-          {data: 'Structure'},
+          {data: 'Chemical', orderable: false, searchable: false},
+          {data: 'Activity', orderable: false, searchable: false},
+          {data: 'Structure', orderable: false, searchable: false}
         ],
   });
 });
 
-
+//$('#data').DataTable().css('background-color', '#FFFFFF')
 updateDataset();
 var e = $('select[name="dataset-selection"]')[0];
 e.addEventListener("change", function() {
     updateDataset();
-
+    $('#data').DataTable().ajax.reload()
 });
 
 </script>

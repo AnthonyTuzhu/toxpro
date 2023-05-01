@@ -34,3 +34,10 @@ function updateDataset() {
     // updateCompoundTable(dataset_data);
 
 }
+
+function getDatasetSelection() {
+    var e = $('select[name="dataset-selection"]')[0];
+    var currentDataset = e.options[e.selectedIndex].value;
+
+    return currentDataset
+}

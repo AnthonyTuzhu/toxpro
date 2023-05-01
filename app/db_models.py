@@ -23,6 +23,10 @@ import redis
 import rq
 import jwt
 from time import time
+
+from rdkit import Chem
+from rdkit.Chem.Draw import rdMolDraw2D
+
 # from app import create_app
 
 # app = create_app()
@@ -118,12 +122,24 @@ class Chemical(db.Model):
     activity = db.Column(db.Integer)
     compound_id = db.Column(db.String)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, structure_as_svg=False):
+        result = {
             'Chemical': self.compound_id,
             'Activity': self.activity,
             'Structure': self.inchi
         }
+
+        if structure_as_svg:
+            result['Structure'] = self.get_svg()
+
+        return result
+
+    def get_svg(self):
+        mol = Chem.MolFromInchi(self.inchi)
+        d2d = rdMolDraw2D.MolDraw2DSVG(250, 200)
+        d2d.DrawMolecule(mol)
+        d2d.FinishDrawing()
+        return d2d.GetDrawingText()
 
 
 class QSARModel(db.Model):
