@@ -157,3 +157,11 @@ margin-top : -16px;
 table.dataTable tbody tr {
   background-color: #ffffff;
 }
+
+.active {
+  color:  rgba(255, 0, 0, 0.5)
+}
+
+.inactive {
+  color:  rgba(0, 0, 255, 0.5)
+}
