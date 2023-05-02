@@ -62,9 +62,9 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-                  <h3>Select endpoint to view distribution:</h3>
+                  <h3>Endpoint distribution:</h3>
 
-                  <label for="endpoint-selection">Select database:</label>
+                  <label for="endpoint-selection">Select endpoint:</label>
                   <select class="form-control" id="endpoint-selection">
                     {% for endpoint in endpoints %}
                         <option value="{{ endpoint.Endpoint }}"> {{ ' %s (%s) ' % (endpoint.Endpoint, endpoint.Dataset)}}</option>
@@ -93,7 +93,12 @@
               success: function (data) {
                   histogramData = data;
                   var data = [histogramData];
-                  Plotly.newPlot('endpoint-histogram', data);
+                  var layout = {
+                      xaxis:{
+                          title: "{{ endpoints[0].Endpoint }}"
+                          }
+                  }
+                  Plotly.newPlot('endpoint-histogram', data, layout);
               }
           }
       )
@@ -106,7 +111,12 @@
               success: function (data) {
                   histogramData = data;
                   var data = [histogramData];
-                  Plotly.react('endpoint-histogram', data);
+                  var layout = {
+                     xaxis:{
+                          title: selectedText
+                          }
+                  }
+                  Plotly.react('endpoint-histogram', data, layout);
               }
           }
       )

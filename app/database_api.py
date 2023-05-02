@@ -84,7 +84,15 @@ def get_toxicity_endpoint():
     df = df.dropna(subset=endpoint_selection)
     trace = {
         'x': df[endpoint_selection].values.tolist(),
-        'type': 'histogram'
-    }
+        'type': 'histogram',
+        'marker': {
+            'color': 'rgb(158,202,225)',
+            'opacity': 0.6,
+            'line': {
+                'color': 'rgb(8,48,107)',
+                'width': 1.5
+            }
+    }}
+
     return trace
 
