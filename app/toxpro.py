@@ -20,6 +20,8 @@ from plotly.graph_objs import *
 
 bp = Blueprint('toxpro', __name__)
 
+TOXICITY_ENDPOINT_INFO = pd.read_csv('data/toxicity-endpoint-info.csv', index_col=0)
+print(TOXICITY_ENDPOINT_INFO)
 
 # this is necessary for declaring
 # variables that are available across
@@ -284,6 +286,7 @@ def toxdata():
 
     return render_template('toxpro/toxdata.html',
                            current_dbs=master_db.CURRENT_DATABASES,
+                           endpoints=TOXICITY_ENDPOINT_INFO.to_dict('records'),
                            bar_plot=bar_plot,
                            pca_plot=pca_plot)
 

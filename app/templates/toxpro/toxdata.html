@@ -58,12 +58,60 @@
         </div>
 
 
+    <div class="row">
+          <div class="col-sm-12">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+              <div class="card-body">
+                  <h3>Select endpoint to view distribution:</h3>
+
+                  <label for="endpoint-selection">Select database:</label>
+                  <select class="form-control" id="endpoint-selection">
+                    {% for endpoint in endpoints %}
+                        <option value="{{ endpoint.Endpoint }}"> {{ ' %s (%s) ' % (endpoint.Endpoint, endpoint.Dataset)}}</option>
+                    {% endfor %}
+                  </select>
+
+              <div id='endpoint-histogram' class='chart'”></div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
     <script type='text/javascript'>
       var pcaPlot = {{pca_plot | safe}};
       Plotly.plot('chart', pcaPlot, {});
 
       var barChart = {{bar_plot | safe}};
       Plotly.plot('bar-chart', barChart, {});
+
+      var histogramData;
+
+      $.ajax('/api/tox-ep',
+          {
+              data: {'endpointSelection': "{{ endpoints[0].Endpoint }}" },
+              success: function (data) {
+                  histogramData = data;
+                  var data = [histogramData];
+                  Plotly.newPlot('endpoint-histogram', data);
+              }
+          }
+      )
+
+      $("#endpoint-selection").on("change", function() {
+          var selectedText = this.value;
+          $.ajax('/api/tox-ep',
+          {
+              data: {'endpointSelection': selectedText },
+              success: function (data) {
+                  histogramData = data;
+                  var data = [histogramData];
+                  Plotly.react('endpoint-histogram', data);
+              }
+          }
+      )
+});
+
     </script>
 
 {% endblock %}

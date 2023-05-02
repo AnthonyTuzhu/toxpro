@@ -7,10 +7,12 @@ from rdkit import rdBase
 from app.db_models import db
 from app.db_models import User, Dataset, Chemical, QSARModel
 
+from app.master_db import get_database
+
 import sys
 import pandas as pd
 
-print(sys.executable)
+TOXICITY_ENDPOINT_INFO = pd.read_csv('data/toxicity-endpoint-info.csv', index_col=0)
 
 bp = Blueprint('api', 'api', url_prefix='/api')
 
@@ -69,4 +71,20 @@ def get_dataset_data():
         'recordsTotal': total_chemicals,
         'draw': request.args.get('draw', type=int)
     }
+
+@bp.route('/tox-ep')
+def get_toxicity_endpoint():
+    """ send back a dataset endpoint """
+    endpoint_selection = request.args.get("endpointSelection")
+    ep = TOXICITY_ENDPOINT_INFO.set_index('Endpoint').loc[endpoint_selection].to_dict()
+
+    df = get_database(ep['Dataset'])
+    df = df[['Master-ID', 'CleanedInChI', endpoint_selection]]
+    df[endpoint_selection] = df[endpoint_selection].apply(pd.to_numeric, errors='coerce')
+    df = df.dropna(subset=endpoint_selection)
+    trace = {
+        'x': df[endpoint_selection].values.tolist(),
+        'type': 'histogram'
+    }
+    return trace
 
