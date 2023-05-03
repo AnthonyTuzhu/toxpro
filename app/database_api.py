@@ -7,7 +7,7 @@ from rdkit import rdBase
 from app.db_models import db
 from app.db_models import User, Dataset, Chemical, QSARModel
 
-from app.master_db import get_database
+from app.master_db import get_database, make_query, get_master
 
 import sys
 import pandas as pd
@@ -56,7 +56,7 @@ def get_dataset_data():
             Chemical.compound_id.like(f'%{search}%'),
             Chemical.activity.like(f'%{search}%')
         ))
-        print(search)
+
     total_filtered = query.count()
 
 
@@ -95,4 +95,93 @@ def get_toxicity_endpoint():
     }}
 
     return trace
+
+@bp.route('/tox-pca-data')
+def get_pca_data():
+    """ send back two traces of data, with a specific color activity highlighted """
+
+    endpoint_selection = request.args.get("endpointSelection", None)
+
+
+
+
+
+    PCA_DF = make_query('select [Master-ID], PCA1, PCA2, PCA3'
+                        ' from chemical_space')
+
+
+
+    # this df contains the chemicals with the specific
+    # endpoint we are looking for
+    ep = TOXICITY_ENDPOINT_INFO.set_index('Endpoint').loc[endpoint_selection].to_dict()
+
+    df = get_database(ep['Dataset'])
+    df = df[['Master-ID', 'CleanedInChI', endpoint_selection]]
+    df[endpoint_selection] = df[endpoint_selection].apply(pd.to_numeric, errors='coerce')
+    df = df.dropna(subset=endpoint_selection)
+
+    PCA_DF = PCA_DF.merge(df, how='left')
+
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'color'] = 'rgba(0, 0, 0, 0.2)'
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'color'] = 'rgb(158, 202,225, 1)'
+
+    # PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'opacity'] = 0.2
+    # PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'opacity'] = 1
+
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'size'] = 5
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'size'] = 10
+
+    trace = {
+        'x': PCA_DF.PCA1.values.tolist(),
+        'y': PCA_DF.PCA2.values.tolist(),
+        'z': PCA_DF.PCA3.values.tolist(),
+        'mode': 'markers',
+        'marker': {
+            'size': PCA_DF['size'].values.tolist(),
+            'color': PCA_DF.color.values.tolist(),
+            #'opacity': PCA_DF.opacity.values.tolist(),
+            'line': {
+                'width': 0
+            },
+        },
+        'type': 'scatter3d'
+    }
+    return trace
+
+
+@bp.route('/update-pca')
+def update_pca():
+    """ send back two traces of data, with a specific color activity highlighted """
+
+
+    endpoint_selection = request.args.get("endpointSelection", None)
+
+    PCA_DF = make_query('select [Master-ID], PCA1, PCA2, PCA3'
+                        ' from chemical_space')
+
+    # this df contains the chemicals with the specific
+    # endpoint we are looking for
+    ep = TOXICITY_ENDPOINT_INFO.set_index('Endpoint').loc[endpoint_selection].to_dict()
+
+    df = get_database(ep['Dataset'])
+    df = df[['Master-ID', 'CleanedInChI', endpoint_selection]]
+    df[endpoint_selection] = df[endpoint_selection].apply(pd.to_numeric, errors='coerce')
+    df = df.dropna(subset=endpoint_selection)
+
+    PCA_DF = PCA_DF.merge(df, how='left')
+
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'color'] = 'rgba(0, 0, 0, 0.2)'
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'color'] = 'rgb(158, 202,225, 1)'
+
+    # PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'opacity'] = 0.2
+    # PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'opacity'] = 1
+
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'size'] = 5
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'size'] = 10
+
+    update = {
+        'marker.color':  [PCA_DF.color.values.tolist()],
+        'marker.size': [PCA_DF['size'].values.tolist()]
+    }
+    return update
 

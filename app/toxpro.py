@@ -21,7 +21,7 @@ from plotly.graph_objs import *
 bp = Blueprint('toxpro', __name__)
 
 TOXICITY_ENDPOINT_INFO = pd.read_csv('data/toxicity-endpoint-info.csv', index_col=0)
-print(TOXICITY_ENDPOINT_INFO)
+
 
 # this is necessary for declaring
 # variables that are available across

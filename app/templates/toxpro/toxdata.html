@@ -20,7 +20,7 @@
           <div class="col-6">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-                        <div id='chart' class='chart'”></div>
+                        <div id='3d-pca' class='chart'”></div>
               </div>
             </div>
           </div>
@@ -28,7 +28,16 @@
         <div class="col-6">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-                        <div id='bar-chart' class='chart'”></div>
+                  <h3>Endpoint distribution:</h3>
+
+                  <label for="endpoint-selection">Select endpoint:</label>
+                  <select class="form-control" id="endpoint-selection">
+                    {% for endpoint in endpoints %}
+                        <option value="{{ endpoint.Endpoint }}"> {{ ' %s (%s) ' % (endpoint.Endpoint, endpoint.Dataset)}}</option>
+                    {% endfor %}
+                  </select>
+
+              <div id='endpoint-histogram' class='chart'”></div>
               </div>
             </div>
           </div>
@@ -62,16 +71,7 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-                  <h3>Endpoint distribution:</h3>
 
-                  <label for="endpoint-selection">Select endpoint:</label>
-                  <select class="form-control" id="endpoint-selection">
-                    {% for endpoint in endpoints %}
-                        <option value="{{ endpoint.Endpoint }}"> {{ ' %s (%s) ' % (endpoint.Endpoint, endpoint.Dataset)}}</option>
-                    {% endfor %}
-                  </select>
-
-              <div id='endpoint-histogram' class='chart'”></div>
 
               </div>
             </div>
@@ -79,11 +79,53 @@
         </div>
 
     <script type='text/javascript'>
-      var pcaPlot = {{pca_plot | safe}};
-      Plotly.plot('chart', pcaPlot, {});
 
-      var barChart = {{bar_plot | safe}};
-      Plotly.plot('bar-chart', barChart, {});
+    var traces;
+
+    var pcaLayout = {
+                  margin: {
+                        l: 0,
+                        r: 0,
+                        b: 0,
+                        t: 0
+                  },
+                  scene: {
+                     camera: {
+                          eye: {
+                          x: 0,
+                          y: 2.5,
+                          z: 0
+                          }
+                  },
+                     xaxis: {
+                         title: 'PC1',
+                         showticklabels: false
+                     },
+                     yaxis: {
+                         title: 'PC1',
+                         showticklabels: false
+                     },
+                     axis: {
+                         title: 'PC1',
+                         showticklabels: false
+                     }
+                  }
+
+
+              };
+
+      $.ajax('/api/tox-pca-data',
+      {
+          data: {'endpointSelection': "{{ endpoints[0].Endpoint }}" },
+          success: function (data) {
+              traces = [data];
+              console.log(traces)
+              Plotly.newPlot('3d-pca', traces, pcaLayout);
+          }
+      }
+      )
+
+
 
       var histogramData;
 
@@ -119,7 +161,19 @@
                   Plotly.react('endpoint-histogram', data, layout);
               }
           }
-      )
+          )
+
+          $.ajax('/api/update-pca',
+              {
+                  data: {'endpointSelection': selectedText},
+                  success: function (data) {
+                      var update = data;
+
+
+                      Plotly.restyle('3d-pca', update, [0]);
+                  }
+              }
+          )
 });
 
     </script>
