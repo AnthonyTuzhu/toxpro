@@ -5,6 +5,7 @@ from app.db_models import db, Dataset, Chemical, QSARModel, Task, CVResults
 from app.curator.curator import Curator
 from app import chem_io
 from app import machine_learning as ml
+from app import pubchem as pc
 
 import sys, time
 import datetime
@@ -174,6 +175,54 @@ def curate_chems(user_id, dataset_name, duplicate_selection, replace=False):
     #db.session.add(cv_results)
     #db.session.commit()
 
+
+def add_pubchem_data(aid, user_id):
+    """ function that adds data from pubchem """
+
+    job = get_current_job()
+
+    job.meta['progress'] = 'Importing data...'
+    job.save_meta()
+    df, fail_reason = pc.import_pubchem_aid(aid)
+
+    if fail_reason is not None:
+        job.meta['progress'] = f'Failed: {fail_reason}'
+        job.save_meta()
+        return
+
+    job.meta['progress'] = 'Adding data...'
+    job.save_meta()
+
+    # check to see if user already imported a dataset
+    # with this name
+    Dataset.query.filter_by(user_id=user_id, dataset_name=f'AID_{aid}').delete()
+
+    db.session.commit()
+
+    dataset = Dataset(dataset_name=f'AID_{aid}', user_id=user_id)
+    db.session.add(dataset)
+    db.session.commit()
+
+    for i, row in df .iterrows():
+        activity = row['activity']
+        cmp_id = row['compound_id']
+        inchi = row['inchi']
+
+        chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
+        dataset.chemicals.append(chem)
+
+    db.session.add(dataset)
+    db.session.commit()
+
+
+    # job done
+    # think about putting this into its own helper function
+    # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+    job.meta['progress'] = 'Complete'
+    job.save_meta()
+    task = Task.query.get(job.get_id())
+    task.complete = True
+    task.time_completed = datetime.datetime.now(timezone.utc)
 
 def example(seconds):
     job = get_current_job()

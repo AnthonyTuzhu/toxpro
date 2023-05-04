@@ -18,6 +18,8 @@ from sqlalchemy import exc
 import pandas as pd
 from plotly.graph_objs import *
 
+import app.pubchem as pc
+
 bp = Blueprint('toxpro', __name__)
 
 TOXICITY_ENDPOINT_INFO = pd.read_csv('data/toxicity-endpoint-info.csv', index_col=0)
@@ -202,6 +204,108 @@ def remove_dataset():
 
     return redirect(url_for('toxpro.datasets'))
 
+@bp.route('/import_pubchem', methods=['POST'])
+@login_required
+def import_pubchem():
+    """
+    import a pubchem data set
+    """
+
+    pubchem_aid_string = request.form.get('pubchem_aid', None)
+
+    try:
+        pubchem_aid = int(pubchem_aid_string)
+    except ValueError:
+        pubchem_aid = None
+
+    if pubchem_aid == None:
+        flash(f'"{pubchem_aid_string}" is not a valid PubChem AID', 'danger')
+        return redirect(url_for('toxpro.datasets'))
+
+    name, reason = pc.get_assay_name(pubchem_aid)
+    if reason is not None:
+        flash(f'Could not find AID {pubchem_aid}', 'danger')
+        return redirect(url_for('toxpro.datasets'))
+
+    current_user.launch_task('add_pubchem_data',
+                             f'Importing structure-activity data for AID {pubchem_aid}: {name}',
+                             pubchem_aid,
+                             current_user.id
+                             )
+    db.session.commit()
+    flash(f'Successfully submitted job for gathering structure-activity data for AID {pubchem_aid}: {name}', 'success')
+    return redirect(url_for('toxpro.datasets'))
+    # if not sdfile:
+    #     error = "No SDFile was attached."
+    #
+    # if sdfile and not sdfile.filename.rsplit('.', 1)[1] in ['sdf']:
+    #     error = "The file is not an SDF"
+    #
+    # if sdfile:
+    #     compound_filename = secure_filename(sdfile.filename)
+    #
+    #     user_uploaded_file = os.path.join(current_app.instance_path, compound_filename)
+    #     name = ntpath.basename(user_uploaded_file).split('.')[0]
+    #
+    #     # create the dataset
+    #     try:
+    #         dataset = Dataset(user_id=current_user.id, dataset_name=name)
+    #         db.session.add(dataset)
+    #         db.session.commit()
+    #     except exc.IntegrityError:
+    #         db.session.rollback()
+    #         error = f'Sorry, there is already a dataset named {name}'
+    #         flash(error, 'danger')
+    #         return redirect(url_for('toxpro.datasets'))
+    #
+    #     # I think we have to save this in order to use it, not sure if we car read it otherwise
+    #     sdfile.save(user_uploaded_file)
+    #
+    #     mols_df = PandasTools.LoadSDF(user_uploaded_file)
+    #     os.remove(user_uploaded_file)
+    #
+    #     if mols_df.empty:
+    #         error = 'No compounds in SDFile'
+    #     if activity_col not in mols_df.columns:
+    #         error = f'Activity {activity_col} not in SDFile.'
+    #     if compound_id_col not in mols_df.columns:
+    #         error = f'Compound ID {compound_id_col} not in SDFile.'
+    #
+    #     if error == None:
+    #
+    #         # coerce activity column to be
+    #         # integer
+    #         mols_df[activity_col] = pd.to_numeric(mols_df[activity_col], errors='coerce')
+    #         mols_df = mols_df[mols_df[activity_col].notnull()]
+    #         mols_df = mols_df[(mols_df[activity_col] == 0) | (mols_df[activity_col] == 1)]
+    #         mols_df[activity_col] = mols_df[activity_col].astype(int)
+    #
+    #         mols_df = mols_df.sort_values(activity_col, ascending=False)
+    #         mols_df = mols_df.drop_duplicates(compound_id_col, keep='first')
+    #
+    #         for i, row in mols_df.iterrows():
+    #             mol = row.ROMol
+    #             activity = row[activity_col]
+    #             cmp_id = row[compound_id_col]
+    #             inchi = Chem.MolToInchi(mol)
+    #
+    #             if cmp_id and inchi and (activity in [1, 0, '1', '0', '1.0', '0.0']):
+    #                 chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
+    #                 dataset.chemicals.append(chem)
+    #
+    #         db.session.add(dataset)
+    #         db.session.commit()
+    #
+    #         num_chemicals = len(list(dataset.chemicals))
+    #         flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
+    #         return redirect(url_for('toxpro.datasets'))
+    #     else:
+    #         db.session.delete(dataset)
+    #         db.session.commit()
+    #
+    # flash(error, 'danger')
+
+    return redirect(url_for('toxpro.datasets'))
 
 
 

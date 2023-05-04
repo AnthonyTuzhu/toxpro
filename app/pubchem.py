@@ -60,6 +60,21 @@ def get_inchi_from_cids(cids: List):
         return r.status_code, r.reason
 
 
+
+def get_assay_name(aid: int):
+    """ uses PubChem PUGRest to revieve Bioassay name """
+    url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/assay/aid/{}/description/json".format(aid)
+
+    r = requests.get(url)
+
+    if r.status_code == 200:
+
+        json_data = r.json()
+        name = json_data["PC_AssayContainer"][0]['assay']['descr']['name']
+        return name, None
+    else:
+        return r.status_code, r.reason
+
 def import_pubchem_aid(aid: int):
     """ given a pubchem identifier import all the bioassay data and
     structure information in a format ready for importing to the sqlite database """
@@ -83,4 +98,6 @@ def import_pubchem_aid(aid: int):
     axis=1
     )
 
-    return result
+    return result, None
+
+print(get_assay_name(1000))
