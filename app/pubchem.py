@@ -100,4 +100,3 @@ def import_pubchem_aid(aid: int):
 
     return result, None
 
-print(get_assay_name(1000))
