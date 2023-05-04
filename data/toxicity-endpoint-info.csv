@@ -1,0 +1,56 @@
+,Dataset,Endpoint,Type
+1,BBB_curated,logBB,Continuous
+2,BCRP_curated,BCRP (evidence of inhibition at 10uM),Categorical
+3,Bioavailability_curated,%F,Continuous
+4,BSEP_curated,BSEP (evidence of inhibition at 100uM),Categorical
+5,Cosmetics_curated,ACTIVITY2,Categorical
+6,DART_curated,Inhalation-Developmental(ppm)-Rodent,Continuous
+,DART_curated,Inhalation-Developmental(ppm)-Nonrodent,Continuous
+,DART_curated,Oral-Developmental(mg/kg/day)-Rodent,Continuous
+,DART_curated,Oral-Developmental(mg/kg/day)-Nonrodent,Continuous
+,DART_curated,Toxrefdb-OralDevelopmental(mg/kg/day)-Rodent,Continuous
+,DART_curated,Toxrefdb-OralMaternal(mg/kg/day)-Rodent,Continuous
+,DART_curated,Inhalation-Maternal(ppm)-Rodent,Continuous
+,DART_curated,Inhalation-Maternal(ppm)-Nonrodent,Continuous
+,DART_curated,Oral-Maternal(mg/kg/day)-Rodent,Continuous
+,DART_curated,Oral-Maternal(mg/kg/day)-Nonrodent,Continuous
+,DART_curated,ToxrefdbOral-Developmental(mg/kg/day)-Rodent,Continuous
+,DART_curated,ToxrefdbOral-Maternal(mg/kg/day)-Rodent,Continuous
+7,Drugbank_curated,ALOGPS_LOGP,Continuous
+,Drugbank_curated,ALOGPS_LOGS,Continuous
+,Drugbank_curated,BIOAVAILABILITY,Categorical
+8,Estrogen_curated,ER-alpha log10 of 100*RBA (relative binding affinity vs estrogen),Continuous
+,Estrogen_curated,Agonist Class,Categorical
+,Estrogen_curated,Antagonist Class,Categorical
+,Estrogen_curated,Binding Class,Categorical
+,Estrogen_curated,Uterotrophic Class,Categorical
+9,FM_curated,"Toxicity to Fat Minnow, -log10 of Conc.(umol/L)",Continuous
+10,Hepatotoxicity_curated,H_HT_class,Categorical
+,Hepatotoxicity_curated,H_CC_class,Categorical
+,Hepatotoxicity_curated,H_MFHB_class,Categorical
+,Hepatotoxicity_curated,H_MF_class,Categorical
+,Hepatotoxicity_curated,H_MFHB_class,Categorical
+,Hepatotoxicity_curated,H_MFHC_class,Categorical
+,Hepatotoxicity_curated,PC_HT_class,Categorical
+,Hepatotoxicity_curated,PC_CC_class,Categorical
+,Hepatotoxicity_curated,PC_MF_class,Categorical
+,Hepatotoxicity_curated,PC_CCHB_class,Categorical
+,Hepatotoxicity_curated,PC_CCHC_class,Categorical
+,Hepatotoxicity_curated,PC_MFHC_class,Categorical
+,Hepatotoxicity_curated,PC_MFHB_class,Categorical
+,Hepatotoxicity_curated,PC_HTdl500_class,Categorical
+,Hepatotoxicity_curated,PC_CCdl500_class,Categorical
+,Hepatotoxicity_curated,PC_MFdl500_class,Categorical
+,Hepatotoxicity_curated,PC_CCHCdl500_class,Categorical
+,Hepatotoxicity_curated,PC_CCHBdl500_class,Categorical
+,Hepatotoxicity_curated,PC_MFHCdl500_class,Categorical
+,Hepatotoxicity_curated,PC_MFHBdl500_class,Categorical
+,Hepatotoxicity_curated,H_CCHB_class,Categorical
+,Hepatotoxicity_curated,H_CCHC_class,Categorical
+11,httk_ADME_Parameters_curated,Human CLint(ul/min/10^6 cells),Continuous
+,httk_ADME_Parameters_curated,Human Fu,Continuous
+,httk_ADME_Parameters_curated,Rat CLint(ul/min/10^6 cells),Continuous
+,httk_ADME_Parameters_curated,Rat Fu,Continuous
+12,LD50_curated,LD50_mgkg,Continuous
+13,MDR1_curated,MDR1 (evidence of inhibition at 10uM),Categorical
+14,pesticides_curated,ACTIVITY2,Categorical
