@@ -57,7 +57,9 @@ def create_app(test_config=None):
 
     #app.redis = Redis.from_url('redis://toxpro-redis-1:6379')
     app.redis = Redis('toxpro-redis-1', 6379)
-    app.task_queue = rq.Queue('toxpro-tasks', connection=app.redis)
+    app.task_queue = rq.Queue('toxpro-tasks',
+                              connection=app.redis,
+                              default_timeout=app.config['REDIS_JOB_TIMEOUT'])
 
     from .emails import mail
     mail.init_app(app)
