@@ -66,7 +66,6 @@ def datasets():
     displays the homepage
 
     """
-    current_user.datasets[0].get_chemicals()
     return render_template('toxpro/datasets.html', user_datasets=list(current_user.datasets))
 
 
