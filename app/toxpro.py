@@ -171,7 +171,7 @@ def remove_dataset():
     """
 
     dataset_selection = request.form['dataset-selection'].strip()
-    do_what_with_dataset =  request.form['action']
+    do_what_with_dataset = request.form['action']
 
     # there are two buttons one to download
     # and one to remove.
@@ -194,7 +194,6 @@ def remove_dataset():
             mimetype="text/plain",
         )
 
-
     dataset = Dataset.query.filter_by(dataset_name=dataset_selection, user_id=current_user.id).first()
     db.session.delete(dataset)
     db.session.commit()
@@ -202,6 +201,7 @@ def remove_dataset():
     flash(message, 'danger')
 
     return redirect(url_for('toxpro.datasets'))
+
 
 @bp.route('/import_pubchem', methods=['POST'])
 @login_required
@@ -307,7 +307,6 @@ def import_pubchem():
     return redirect(url_for('toxpro.datasets'))
 
 
-
 @bp.route('/assayProfile', methods=['GET'])
 @login_required
 def assayProfile():
@@ -322,76 +321,9 @@ def assayProfile():
 @bp.route('/toxdata', methods=['GET'])
 @login_required
 def toxdata():
-    """
-    displays the homepage
-    """
-    import numpy as np
-
-    masterdb = master_db.get_master()
-
-    PCA_DF = master_db.make_query('select * from chemical_space')
-    PCA_DF['Total Appearance in all datasets'] = PCA_DF['LD50-ID']+ PCA_DF['Hepatotoxicity-ID'] +PCA_DF['DART-ID'] +\
-                                 PCA_DF['BBB-ID'] + PCA_DF['BCRP-ID'] +PCA_DF['Bioavailability-ID']+\
-                                 PCA_DF['BSEP-ID'] +PCA_DF['Drugbank-ID'] +PCA_DF['Estrogen-ID'] +\
-                                 PCA_DF['FM-ID'] + PCA_DF['MDR1-ID']
-
-    fig = px.scatter_3d(PCA_DF,
-        x="PCA1",
-        y="PCA2",
-        z="PCA3", size_max=6, title='Principal Component Analysis of all compounds',
-        color= 'Total Appearance in all datasets', #color_continuous_scale='plasma',
-        width=800, height=600,
-    )
-    fig.update_traces(marker_size=1)
-    fig.update_layout(scene=Scene(
-        xaxis=XAxis(title='Principal Component 1'),
-        yaxis=YAxis(title='Principal Component 2'),
-        zaxis=ZAxis(title='Principal Component 3')))
-    fig.update_layout(template='plotly_white',
-                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
-                      )
-
-    pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
-    # add code for bar plot
-
-    N_LD50 = masterdb['LD50-ID'].notnull().sum()
-    N_hep = masterdb['Hepatotoxicity-ID'].notnull().sum()
-    N_dart = masterdb['DART-ID'].notnull().sum()
-    N_BBB = masterdb['BBB-ID'].notnull().sum()
-    N_BCRP = masterdb['BCRP-ID'].notnull().sum()
-    N_Bioavailability = masterdb['Bioavailability-ID'].notnull().sum()
-    N_BSEP = masterdb['BSEP-ID'].notnull().sum()
-    N_Drugbank = masterdb['Drugbank-ID'].notnull().sum()
-    N_Estrogen = masterdb['Estrogen-ID'].notnull().sum()
-    N_FM = masterdb['FM-ID'].notnull().sum()
-    N_MDR1 = masterdb['MDR1-ID'].notnull().sum()
-    endpoints = ['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
-                 'MDR1']
-
-    fig2 = px.bar(
-        y=[N_LD50, N_hep, N_dart, N_BBB, N_BCRP, N_Bioavailability, N_BSEP, N_Drugbank, N_FM, N_Estrogen, N_MDR1],
-        x=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
-           'MDR1'],
-        color=['LD50', 'Hepatotoxicity', 'DART', 'BBB', 'BCRP', 'Bioavailability', 'BSEP', 'DART', 'Drugbank', 'FM',
-           'MDR1'],
-        labels={'x': 'Endpoint', 'y': "Number of Compounds"},
-        title='Size of datasets',
-        height=400,
-    )
-    fig2.update_layout(xaxis={'categoryorder': 'total ascending'})
-    fig2.update_layout(showlegend=False)
-    fig2.update_layout(template='plotly_white',
-                      scene=dict(aspectratio=dict(x=1, y=1, z=1))
-                      )
-
-    bar_plot = json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder)
-
     return render_template('toxpro/toxdata.html',
                            current_dbs=master_db.CURRENT_DATABASES,
-                           endpoints=TOXICITY_ENDPOINT_INFO.to_dict('records'),
-                           bar_plot=bar_plot,
-                           pca_plot=pca_plot)
+                           endpoints=TOXICITY_ENDPOINT_INFO.to_dict('records'))
 
 
 @bp.route('/download_database', methods=['POST'])
