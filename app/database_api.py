@@ -215,6 +215,9 @@ def get_bioprofile_data():
     if dataset in ['LD50_curated']:
         bioprofile.loc[bioprofile[endpoint_selection] < med, 'activity'] = 1
         bioprofile.loc[bioprofile[endpoint_selection] >= med, 'activity'] = 0
+    else:
+        bioprofile.loc[bioprofile[endpoint_selection] < med, 'activity'] = 0
+        bioprofile.loc[bioprofile[endpoint_selection] >= med, 'activity'] = 1
 
     matrix = (
         bioprofile
