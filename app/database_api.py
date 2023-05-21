@@ -206,15 +206,15 @@ def get_bioprofile_data():
 
     bioprofile = pd.read_csv(os.path.join(config.Config.BIOPROFILE_DIR, f"{dataset}+{endpoint_selection}.csv"))
     med = (
-        bioprofile[['Master-ID', dataset]]
+        bioprofile[['Master-ID', endpoint_selection]]
         .drop_duplicates()
-        [dataset]
+        [endpoint_selection]
         .median()
     )
-    bioprofile['activity'] = bioprofile[dataset].copy()
+    bioprofile['activity'] = bioprofile[endpoint_selection].copy()
     if dataset in ['LD50_value']:
-        bioprofile.loc[bioprofile[dataset] < med, 'activity'] = 1
-        bioprofile.loc[bioprofile[dataset] >= med, 'activity'] = 0
+        bioprofile.loc[bioprofile[endpoint_selection] < med, 'activity'] = 1
+        bioprofile.loc[bioprofile[endpoint_selection] >= med, 'activity'] = 0
 
     matrix = (
         bioprofile
@@ -238,8 +238,9 @@ def get_bioprofile_data():
     pca = PCA_DF.merge(CID_DF, on='Master-ID', how='inner').join(
         bioprofile[['CID', 'activity']].drop_duplicates().set_index('CID'))
     pca['CIDs'] = pca.index
+    pca = pd.merge(pca, bioprofile, on='Master-ID', how='inner')
 
-    bio_info = pd.read_table(config.BIOASSAYS)
+    bio_info = pd.read_table(config.Config.BIOASSAYS)
     biodict = dict(zip(bio_info['AID'], bio_info['BioAssay Name']))
     pca['BioAssay Name'] = pca['AID'].map(biodict)
 
