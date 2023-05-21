@@ -17,7 +17,7 @@
         </div>
 
         <div class="row">
-          <div class="col-6">
+          <div class="col-5">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
                         <div id='3d-pca' class='chart'”></div>
@@ -25,7 +25,7 @@
             </div>
           </div>
 
-        <div class="col-6">
+        <div class="col-7">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
                   <h3>Endpoint distribution:</h3>
@@ -117,13 +117,15 @@
 
               };
 
+    var config = {responsive: true}
+
       $.ajax('/api/tox-pca-data',
       {
           data: {'endpointSelection': "{{ endpoints[0].Endpoint }}" },
           success: function (data) {
               traces = [data];
               console.log(traces)
-              Plotly.newPlot('3d-pca', traces, pcaLayout);
+              Plotly.newPlot('3d-pca', traces, pcaLayout, config);
           }
       }
       )
@@ -142,8 +144,9 @@
                       xaxis:{
                           title: "{{ endpoints[0].Endpoint }}"
                           }
-                  }
-                  Plotly.newPlot('endpoint-histogram', data, layout);
+                  };
+                  var config = {responsive: true}
+                  Plotly.newPlot('endpoint-histogram', data, layout, config);
               }
           }
       )
@@ -160,8 +163,9 @@
                      xaxis:{
                           title: selectedText
                           }
-                  }
-                  Plotly.react('endpoint-histogram', data, layout);
+                  };
+                  var config = {responsive: true}
+                  Plotly.react('endpoint-histogram', data, layout, config);
               }
           }
           )
