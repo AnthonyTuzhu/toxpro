@@ -212,7 +212,7 @@ def get_bioprofile_data():
         .median()
     )
     bioprofile['activity'] = bioprofile[endpoint_selection].copy()
-    if dataset in ['LD50_value']:
+    if dataset in ['LD50_curated']:
         bioprofile.loc[bioprofile[endpoint_selection] < med, 'activity'] = 1
         bioprofile.loc[bioprofile[endpoint_selection] >= med, 'activity'] = 0
 
