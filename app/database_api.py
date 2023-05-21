@@ -122,14 +122,14 @@ def get_pca_data():
 
     PCA_DF = PCA_DF.merge(df, how='left')
 
-    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'color'] = 'rgba(0, 0, 0, 0.2)'
-    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'color'] = 'rgb(158, 202,225, 1)'
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'color'] = 'rgba(20, 40, 186, 0.7)'
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'color'] = 'rgb(201, 40, 0, 1)'
 
     # PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'opacity'] = 0.2
     # PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'opacity'] = 1
 
-    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'size'] = 5
-    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'size'] = 10
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'size'] = 1
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'size'] = 5
 
     trace = {
         'x': PCA_DF.PCA1.values.tolist(),
@@ -170,14 +170,14 @@ def update_pca():
 
     PCA_DF = PCA_DF.merge(df, how='left')
 
-    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'color'] = 'rgba(0, 0, 0, 0.2)'
-    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'color'] = 'rgb(158, 202,225, 1)'
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'color'] = 'rgba(20, 40, 186, 0.7)'
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'color'] = 'rgb(201, 40, 0, 1)'
 
     # PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'opacity'] = 0.2
     # PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'opacity'] = 1
 
-    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'size'] = 5
-    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'size'] = 10
+    PCA_DF.loc[PCA_DF[endpoint_selection].isnull(), 'size'] = 1
+    PCA_DF.loc[PCA_DF[endpoint_selection].notnull(), 'size'] = 5
 
     update = {
         'marker.color':  [PCA_DF.color.values.tolist()],
