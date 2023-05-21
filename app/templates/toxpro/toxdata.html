@@ -6,7 +6,7 @@
 
         <div class="row">
           <div class="col-sm-12">
-            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+            <div class="card shadow p-7 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
                   <h3>ToxiVerse Databases</h3>
                   <p>This page provides an overview of ToxiVerse datasets and their statistics.</p>
@@ -18,7 +18,7 @@
 
         <div class="row">
           <div class="col-5">
-            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+            <div class="card shadow p-7 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
                         <div id='3d-pca' class='chart'”></div>
               </div>
@@ -47,7 +47,8 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-
+                  <h3>Top 20 Bioassays:</h3>
+                  <div id='bioassay-table' class='table-stripped'”></div>
 
               </div>
             </div>
@@ -174,13 +175,44 @@
               {
                   data: {'endpointSelection': selectedText},
                   success: function (data) {
-                      var update = data;
+                      var update = data
 
 
                       Plotly.restyle('3d-pca', update, [0]);
                   }
               }
           )
+});
+
+
+
+
+      var BioAssays;
+
+      $.ajax('/api/tox-bioprofile',
+          {
+              data: {'endpointSelection': "{{ endpoints[0].Endpoint }}" },
+              success: function (data) {
+                  let bioAssays = data;
+                  var table = document.getElementById("bioassay-table");
+                  table.appendChild(bioAssays);
+              }
+          }
+      )
+
+      $("#endpoint-selection").on("change", function() {
+          var selectedText = this.value;
+          $.ajax('/api/tox-bioprofile',
+          {
+              data: {'endpointSelection': selectedText },
+              success: function (data) {
+                  let bioAssays = data;
+                  var table = document.getElementById("bioassay-table");
+                  table.replaceChild(bioAssays, table);
+              }
+          }
+          )
+
 });
 
     </script>

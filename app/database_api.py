@@ -5,11 +5,12 @@ from rdkit.Chem import AllChem
 from rdkit import rdBase
 
 from app.db_models import db
+import app.config as config
 from app.db_models import User, Dataset, Chemical, QSARModel
 
 from app.master_db import get_database, make_query, get_master
 
-import sys
+import sys, os
 import pandas as pd
 
 TOXICITY_ENDPOINT_INFO = pd.read_csv('data/toxicity-endpoint-info.csv', index_col=0)
@@ -185,3 +186,69 @@ def update_pca():
     }
     return update
 
+@bp.route('/tox-bioprofile')
+def get_bioprofile_data():
+    endpoint_selection = request.args.get("endpointSelection", None)
+    ep = TOXICITY_ENDPOINT_INFO.set_index('Endpoint').loc[endpoint_selection].to_dict()
+    dataset = ep['Dataset']
+
+    def confusion_matrix(df, activity_class, dataset_name):
+        """ this function calculates the confusion matrix for an assay, toxicity pair """
+        df[activity_class] = pd.to_numeric(df[activity_class], errors='coerce')
+        df = df[df[activity_class].notnull()]
+
+        tps = ((df[activity_class] == 1) & (df.Activity_Transformed == 1)).sum()
+        fps = ((df[activity_class] == 0) & (df.Activity_Transformed == 1)).sum()
+        tns = ((df[activity_class] == 0) & (df.Activity_Transformed == 0)).sum()
+        fns = ((df[activity_class] == 1) & (df.Activity_Transformed == 0)).sum()
+
+        return tps, fps, tns, fns
+
+    bioprofile = pd.read_csv(os.path.join(config.Config.BIOPROFILE_DIR, f"{dataset}+{endpoint_selection}.csv"))
+    med = (
+        bioprofile[['Master-ID', dataset]]
+        .drop_duplicates()
+        [dataset]
+        .median()
+    )
+    bioprofile['activity'] = bioprofile[dataset].copy()
+    if dataset in ['LD50_value']:
+        bioprofile.loc[bioprofile[dataset] < med, 'activity'] = 1
+        bioprofile.loc[bioprofile[dataset] >= med, 'activity'] = 0
+
+    matrix = (
+        bioprofile
+        .groupby('AID')
+        .apply(lambda x: confusion_matrix(x, endpoint_selection, dataset))
+        .apply(pd.Series)
+        .set_axis(['TP', 'FP', 'TN', 'FN'], axis=1)
+        .reset_index()
+        .sort_values('TP', ascending=False)
+    )
+    matrix['PPV'] = matrix.TP / (matrix.TP + matrix.FP)
+    matrix['Sensitivity'] = matrix.TP / (matrix.TP + matrix.FN)
+    bioprofile = pd.merge(matrix, bioprofile, on='AID', how='inner')
+
+    PCA_DF = make_query('select [Master-ID], PCA1, PCA2, PCA3'
+                        ' from chemical_space')
+
+    CID_DF = make_query('select [Master-ID], [CID]'
+                        ' from cid_lookup')
+
+    pca = PCA_DF.merge(CID_DF, on='Master-ID', how='inner').join(
+        bioprofile[['CID', 'activity']].drop_duplicates().set_index('CID'))
+    pca['CIDs'] = pca.index
+
+    bio_info = pd.read_table(config.BIOASSAYS)
+    biodict = dict(zip(bio_info['AID'], bio_info['BioAssay Name']))
+    pca['BioAssay Name'] = pca['AID'].map(biodict)
+
+    table = pca.groupby(['AID', 'BioAssay Name'])['Activity_Transformed']\
+        .value_counts()\
+        .unstack(fill_value=0)\
+        .rename(columns={-1.0: 'Inactive', 0.0: 'Inconclusive', 1.0: 'Active'})
+    table['Active rate'] = table['Active'] / (table['Active'] + table['Inactive'])
+    table = pd.DataFrame(table.to_records())
+    top_assays = table.sort_values(by=['Active rate'], ascending=False).head(20).to_dict(orient='records')
+
+    return top_assays
