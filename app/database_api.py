@@ -253,6 +253,6 @@ def get_bioprofile_data():
         .rename(columns={-1.0: 'Inactive', 0.0: 'Inconclusive', 1.0: 'Active'})
     table['Active rate'] = table['Active'] / (table['Active'] + table['Inactive'])
     table = pd.DataFrame(table.to_records())
-    top_assays = table.sort_values(by=['Active rate'], ascending=False).head(20).to_dict(orient='records')
+    top_assays = table.sort_values(by=['Active rate'], ascending=False).head(20).to_html()
 
     return top_assays
