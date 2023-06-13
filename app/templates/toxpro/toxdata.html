@@ -32,7 +32,7 @@
                   <h3>Endpoint distribution</h3>
 
                   <label for="endpoint-selection">Select endpoint:</label>
-                  <select class="form-control" id="endpoint-selection">
+                  <select class="form-control" id="endpoint-selection" name="endpoint-selection">
                     {% for endpoint in endpoints %}
                         <option value="{{ endpoint.Endpoint }}"> {{ ' %s (%s) ' % (endpoint.Endpoint, endpoint.Dataset)}}</option>
                     {% endfor %}
@@ -49,9 +49,20 @@
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
                   <h3>Top 20 Bioassays</h3>
-                  <div id='bioassay-table' class='table-stripped'”></div>
-
-              </div>
+                  <table id="bioassay-table" class="table">
+                    <thead>
+                      <tr>
+                        <th>AID</th>
+                        <th>Bioassay name</th>
+                        <th>Inactive</th>
+                        <th>Inconclusive</th>
+                        <th>Active</th>
+                        <th>Active rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                  </table>
             </div>
           </div>
         </div>
@@ -153,6 +164,28 @@
           }
       )
 
+    $(document).ready(function () {
+                $('#bioassay-table').DataTable({
+                paging: false,
+                searching: false,
+                serverSide: true,
+                ajax: {
+                    "url": '/api/tox-bioprofile',
+                    data: function(d) {
+                    d.endpointSelection = getEndpointSelection();},
+                },
+                columns: [
+                    {data: 'AID'},
+                    {data: 'BioAssay Name'},
+                    {data: 'Inactive'},
+                    {data: 'Inconclusive'},
+                    {data: 'Active'},
+                    {data: 'Active rate'},
+            ],
+        });
+      });
+
+
       $("#endpoint-selection").on("change", function() {
           var selectedText = this.value;
           $.ajax('/api/tox-ep',
@@ -183,38 +216,32 @@
                   }
               }
           )
-});
+          });
 
 
+      $(`#endpoint-selection`).change(function () {
+          $('#bioassay-table').dataTable().fnClearTable();
+          $('#bioassay-table').DataTable({
+                destroy: true,
+                paging: false,
+                searching: false,
+                serverSide: true,
+                ajax: {
+                    "url": '/api/tox-bioprofile',
+                    data: function(d) {
+                    d.endpointSelection = getEndpointSelection();},
+                },
+                columns: [
+                    {data: 'AID'},
+                    {data: 'BioAssay Name'},
+                    {data: 'Inactive'},
+                    {data: 'Inconclusive'},
+                    {data: 'Active'},
+                    {data: 'Active rate'},
+            ],
+        });
+      });
 
-
-      var BioAssays;
-
-      $.ajax('/api/tox-bioprofile',
-          {
-              data: {'endpointSelection': "{{ endpoints[0].Endpoint }}" },
-              success: function (data) {
-                  let bioAssays = data;
-                  var table = document.getElementById("bioassay-table");
-                  table.appendChild(bioAssays);
-              }
-          }
-      )
-
-      $("#endpoint-selection").on("change", function() {
-          var selectedText = this.value;
-          $.ajax('/api/tox-bioprofile',
-          {
-              data: {'endpointSelection': selectedText },
-              success: function (data) {
-                  let bioAssays = data;
-                  var table = document.getElementById("bioassay-table");
-                  table.replaceChild(bioAssays, table);
-              }
-          }
-          )
-
-});
 
     </script>
 
