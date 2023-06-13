@@ -41,3 +41,17 @@ function getDatasetSelection() {
 
     return currentDataset
 }
+
+function getEndpointSelection() {
+    var e = $('select[name="endpoint-selection"]')[0];
+    var currentEndpoint = e.options[e.selectedIndex].value;
+
+    return currentEndpoint
+}
+
+function updateEndpoint() {
+    var e = $('select[name="endpoint-selection"]')[0];
+    var currentEndpoint = e.options[e.selectedIndex].value;
+
+    return currentEndpoint
+}
