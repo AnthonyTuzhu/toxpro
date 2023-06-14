@@ -48,7 +48,8 @@
           <div class="col-sm-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
-                  <h3>Top 20 Bioassays</h3>
+                  <h3>Ranking of bioassays</h3>
+                  <p>This is the table of bioassays ranked by their active rates (active compounds numbers in all bioassays).</p>
                   <table id="bioassay-table" class="table">
                     <thead>
                       <tr>
@@ -68,7 +69,7 @@
         </div>
 
     <div class="row">
-          <div class="col-sm-12">
+          <div class="col-md-12">
             <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
               <div class="card-body">
 
@@ -166,9 +167,10 @@
 
     $(document).ready(function () {
                 $('#bioassay-table').DataTable({
-                paging: false,
-                searching: false,
-                serverSide: true,
+                paging: true,
+                searching: true,
+                serverSide: false,
+                order: [[5, 'desc']],
                 ajax: {
                     "url": '/api/tox-bioprofile',
                     data: function(d) {
@@ -223,9 +225,10 @@
           $('#bioassay-table').dataTable().fnClearTable();
           $('#bioassay-table').DataTable({
                 destroy: true,
-                paging: false,
-                searching: false,
-                serverSide: true,
+                paging: true,
+                searching: true,
+                serverSide: false,
+                order: [[5, 'desc']],
                 ajax: {
                     "url": '/api/tox-bioprofile',
                     data: function(d) {
