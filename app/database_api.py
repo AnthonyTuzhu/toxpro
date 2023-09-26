@@ -136,6 +136,8 @@ def get_pca_data():
                 'width': 0
             },
         },
+        'hoverinfo': 'text',
+        'text': ['Master-ID:' + str(cid) for cid in PCA_DF['Master-ID'].values.tolist()],
         'type': 'scatter3d'
     }
     return trace
