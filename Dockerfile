@@ -11,7 +11,7 @@ RUN venv/bin/pip install -r requirements.txt
 # netcat is a program
 # necessary for troubleshooting
 # the networking
-RUN apt-get update && apt-get install -y netcat
+RUN apt-get update && apt-get install -y netcat-traditional
 
 
 COPY app app
