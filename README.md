@@ -1,9 +1,12 @@
-# ToxPro
+# Welcome to ToxPro Project
 
 ![repo version](https://img.shields.io/badge/Version-v.%200.2-green)
+
+*Added regression QSAR modeling module (experimental)
 ### BASIC SETUP
 
-To set up the conda env, you need to use the `requirements.txt` file to install
+
+To open this project on your computer, you need to set up the conda env by using the `requirements.txt` file to install
 the necessary python dependencies.
 
 First, create a new conda env
