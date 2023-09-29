@@ -54,7 +54,7 @@
               <form action="{{ url_for('cheminf.QSAR_build') }}" method="post" enctype="multipart/form-data">
                 <div class="row text-muted">
 
-                    <div class="col-lg-4">
+                    <div class="col-lg-12">
                         <h6>Select Dataset: </h6>
                         <select class="form-control" name="dataset-selection">
                         {% for dataset in user_datasets %}
@@ -62,7 +62,9 @@
                         {% endfor %}
                         </select>
                     </div>
-                    <div class="col-3">
+                    <br><br>
+                    <br><br>
+                    <div class="col-lg-4">
                         <h6>Select Features: </h6>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="descriptor-selection" value="ECFP6" checked>
@@ -77,7 +79,7 @@
                             <label class="form-check-label" for="radioRdkit">RDKit Descriptors</label>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-lg-4">
                         <h6>Select Algorithm: </h6>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="algorithm-selection" value="RF" checked>
@@ -92,7 +94,7 @@
                             <label class="form-check-label" for="radioSVM">Support Vector Machine (SVM) </label>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-lg-4">
                         <h6>Select Features: </h6>
                         <div class="form-check">
                             <input type="radio" class="form-check-input" name="type-selection" value="Classification" checked>
@@ -131,7 +133,7 @@
         {% if user.has_qsar %}
         <div class="row">
           <div class="col-sm-12">
-            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card">
+            <div class="card shadow p-3 mb-5 bg-white rounded" id="dataset-card" style="overflow-x:scroll">
                 <div class="card-body">
                 <div class="row pt-4">
                 <h3>Trained Models</h3>
