@@ -1,4 +1,4 @@
-# Welcome to ToxPro Project
+# Welcome to ToxiVerse Project
 
 ![repo version](https://img.shields.io/badge/Version-v.%200.2-green)
 
