@@ -150,6 +150,7 @@ class QSARModel(db.Model):
     name = db.Column(db.String)
     algorithm = db.Column(db.String)
     descriptors = db.Column(db.String)
+    type = db.Column(db.String)
     dataset_id = db.Column(db.Integer, db.ForeignKey('dataset.id'))
     sklearn_model = db.Column(db.BLOB)
     created = db.Column(db.DateTime, default=datetime.utcnow)
@@ -176,6 +177,11 @@ class CVResults(db.Model):
     recall = db.Column(db.Float)
     specificity = db.Column(db.Float)
     correct_classification_rate = db.Column(db.Float)
+    r2_score = db.Column(db.Float)
+    max_error = db.Column(db.Float)
+    mean_squared_error = db.Column(db.Float)
+    mean_absolute_percentage_error =db.Column(db.Float)
+    pinball_score = db.Column(db.Float)
 
     qsar_model_id = db.Column(db.Integer, db.ForeignKey('qsar_model.id'))
 

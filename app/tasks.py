@@ -16,7 +16,8 @@ import pandas as pd
 app = create_app()
 app.app_context().push()
 
-def build_qsar(user_id, dataset_name, descriptors, algorithm):
+
+def build_qsar(user_id, dataset_name, descriptors, algorithm, type):
     """ function that ties together the entirity of building a QSAR model
      this is necessary to be able to submit as a task in redis. """
 
@@ -34,9 +35,8 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
     qsar_model = QSARModel.query.filter_by(user_id=user_id,
                                            algorithm=algorithm,
                                            descriptors=descriptors,
+                                           type=type,
                                            dataset_id=dataset.id).first()
-
-
 
     if qsar_model:
         # erase exists models
@@ -61,22 +61,29 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
     # start training
     job.meta['progress'] = 'Training Model...'
     job.save_meta()
-    model, cv_preds, train_stats = ml.build_qsar_model(X,
-                                                       y,
-                                                       algorithm,
-                                                       scale=scale)
+    if type == 'Classification':
+        model, cv_preds, train_stats = ml.build_qsar_model(X,
+                                                           y,
+                                                           algorithm,
+                                                           scale=scale)
 
+    # Added regression models (share same results but parameters are different for each (using different columns)
+
+    elif type == 'Regression':
+        model, cv_preds, train_stats = ml.build_qsar_model_regression(X,
+                                                                      y,
+                                                                      algorithm,
+                                                                      scale=scale)
 
     qsar_model = QSARModel(user_id=user_id,
-                           name=f'{dataset_name}-{descriptors}-{algorithm}',
+                           name=f'{dataset_name}-{descriptors}-{algorithm}-{type}',
                            algorithm=algorithm,
                            descriptors=descriptors,
+                           type=type,
                            dataset_id=dataset.id,
                            sklearn_model=model)
     db.session.add(qsar_model)
     db.session.commit()
-
-
 
     cv_results = CVResults(qsar_model_id=qsar_model.id,
                            accuracy=train_stats['ACC'],
@@ -88,10 +95,15 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm):
                            recall=train_stats['Recall'],
                            specificity=train_stats['Specificity'],
                            correct_classification_rate=train_stats['CCR'],
+                           r2_score=train_stats['R2-score'],
+                           max_error=train_stats['Max-error'],
+                           mean_squared_error=train_stats['Mean-squared-error'],
+                           mean_absolute_percentage_error=train_stats['Mean-absolute-percentage-error'],
+                           pinball_score=train_stats['D2-pinball-score']
                            )
-    # job done
-    # think about putting this into its own helper function
-    # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+
+    # job done think about putting this into its own helper function like in _set_task_progress() here:
+    # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
     job.meta['progress'] = 'Complete'
     job.save_meta()
     task = Task.query.get(job.get_id())
@@ -133,7 +145,7 @@ def curate_chems(user_id, dataset_name, duplicate_selection, replace=False):
         db.session.add(new_dataset)
         db.session.commit()
 
-        for i, row in new_df .iterrows():
+        for i, row in new_df.iterrows():
             activity = row['activity']
             cmp_id = row['compound_id']
             inchi = row['inchi']
@@ -151,7 +163,7 @@ def curate_chems(user_id, dataset_name, duplicate_selection, replace=False):
 
         db.session.commit()
 
-        for i, row in new_df .iterrows():
+        for i, row in new_df.iterrows():
             activity = row['activity']
             cmp_id = row['compound_id']
             inchi = row['inchi']
@@ -162,18 +174,16 @@ def curate_chems(user_id, dataset_name, duplicate_selection, replace=False):
         db.session.add(dataset)
         db.session.commit()
 
-    # job done
-    # think about putting this into its own helper function
-    # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+    # job done think about putting this into its own helper function like in _set_task_progress() here:
+    # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
     job.meta['progress'] = 'Complete'
     job.save_meta()
     task = Task.query.get(job.get_id())
     task.complete = True
     task.time_completed = datetime.datetime.now(timezone.utc)
 
-
-    #db.session.add(cv_results)
-    #db.session.commit()
+    # db.session.add(cv_results)
+    # db.session.commit()
 
 
 def add_pubchem_data(aid, user_id):
@@ -203,7 +213,7 @@ def add_pubchem_data(aid, user_id):
     db.session.add(dataset)
     db.session.commit()
 
-    for i, row in df .iterrows():
+    for i, row in df.iterrows():
         activity = row['activity']
         cmp_id = row['compound_id']
         inchi = row['inchi']
@@ -214,7 +224,6 @@ def add_pubchem_data(aid, user_id):
     db.session.add(dataset)
     db.session.commit()
 
-
     # job done
     # think about putting this into its own helper function
     # like in _set_task_progress() here: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
@@ -223,6 +232,7 @@ def add_pubchem_data(aid, user_id):
     task = Task.query.get(job.get_id())
     task.complete = True
     task.time_completed = datetime.datetime.now(timezone.utc)
+
 
 def example(seconds):
     job = get_current_job()
@@ -235,6 +245,7 @@ def example(seconds):
     job.meta['progress'] = 100
     job.save_meta()
     print('Task completed')
+
 
 if __name__ == '__main__':
     curate_chems(1, "AMES_curated")

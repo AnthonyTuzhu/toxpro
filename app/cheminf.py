@@ -176,15 +176,17 @@ def QSAR_build():
     dataset_selection = request.form['dataset-selection'].strip()
     desc_selection = request.form['descriptor-selection'].strip()
     alg_selection = request.form['algorithm-selection'].strip()
+    type_selection = request.form['type-selection'].strip()
 
-    name = f'{dataset_selection}-{desc_selection}-{alg_selection}'
+    name = f'{dataset_selection}-{desc_selection}-{alg_selection}-{type_selection}'
     try:
         current_user.launch_task('build_qsar',
                                  f'Building QSAR Model on {name}',
                                  current_user.id,
                                  dataset_selection,
                                  desc_selection,
-                                 alg_selection
+                                 alg_selection,
+                                 type_selection
                                  )
         db.session.commit()
     except exc.OperationalError as err:
