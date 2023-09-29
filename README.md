@@ -4,7 +4,7 @@
 
 *Added regression QSAR modeling module (experimental)
 ### BASIC SETUP
-
+This app is a Flask-based, online chemical data analysis platform.
 
 To open this project on your computer, you need to set up the conda env by using the `requirements.txt` file to install
 the necessary python dependencies.
