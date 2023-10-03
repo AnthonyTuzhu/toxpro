@@ -25,6 +25,7 @@ then use pip to install dependencies
 ```
 pip install -r requirements.txt
 ```
+You need to activate it as interpreter in the conda environment.
 
 then download the database folders on Google Drive:
 https://drive.google.com/drive/folders/1gBxySt2uk6XNflRyA7mf5y-zqY0p2ErS?usp=drive_link (data) and
