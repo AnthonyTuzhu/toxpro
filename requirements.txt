@@ -9,6 +9,7 @@ flask-login==0.6.2
 flask-migrate==4.0.0
 Flask-Mail==0.9.1
 scikit-learn==1.2.0
+Werkzeug==2.2.2
 redis==4.4.0
 rq==1.11.1
 PyJWT==2.6.0
