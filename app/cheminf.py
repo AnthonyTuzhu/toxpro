@@ -28,9 +28,10 @@ import json
 import app.chem_io as chem_io
 import app.machine_learning as ml
 
-#from app.db import get_db
+# from app.db import get_db
 from app.db_models import User, db
 
+import itertools
 
 bp = Blueprint('cheminf', __name__, url_prefix='/cheminf')
 
@@ -47,7 +48,6 @@ def curator():
     current_user.has_qsar = any(d.qsar_models for d in current_user.datasets)
     if request.method == 'GET':
         return render_template('cheminf/curator.html', user_datasets=list(current_user.datasets), user=current_user)
-
 
     dataset_selection = request.form['dataset-selection'].strip()
     dup_selection = request.form['duplicate-selection'].strip()
@@ -85,9 +85,9 @@ def PCA():
     dataset_selection = request.form['dataset-selection'].strip()
 
     query_statement = db.session.query(Chemical).join(Dataset,
-                                                       Dataset.id == Chemical.dataset_id) \
-                                                        .filter(Dataset.dataset_name==dataset_selection) \
-                                                        .filter(Dataset.user_id==current_user.id).statement
+                                                      Dataset.id == Chemical.dataset_id) \
+        .filter(Dataset.dataset_name == dataset_selection) \
+        .filter(Dataset.user_id == current_user.id).statement
     df = pd.read_sql(query_statement, db.session.connection())
 
     desc_set = ['MolWt', 'TPSA', 'NumRotatableBonds', 'NumHDonors', 'NumHAcceptors', 'MolLogP']
@@ -103,35 +103,34 @@ def PCA():
 
     pca['Activity'] = pca['Activity'].astype('category')
 
-
     fig = px.scatter_3d(pca,
-                     x='PCA1',
-                     y='PCA2',
-                     z='PCA3',
-                     color='Activity',
-                     hover_name='CMP_ID',
-                     hover_data=['Activity', 'PCA1', 'PCA2'],
-                     labels={
-                         "PCA1": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[0]),
-                         "PCA2": "PC2 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[1]),
-                         "PCA3": "PC3 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[2]),
-                     },
-                    height=800, # default height
-                    color_discrete_map={
-                        1: "rgba(255, 0, 0, 0.5)",
-                        0: "rgba(0, 0, 255, 0.5)"
+                        x='PCA1',
+                        y='PCA2',
+                        z='PCA3',
+                        color='Activity',
+                        hover_name='CMP_ID',
+                        hover_data=['Activity', 'PCA1', 'PCA2'],
+                        labels={
+                            "PCA1": "PC1 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[0]),
+                            "PCA2": "PC2 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[1]),
+                            "PCA3": "PC3 ({:.2%})".format(skl_PCA_fit.explained_variance_ratio_[2]),
+                        },
+                        height=800,  # default height
+                        color_discrete_map={
+                            1: "rgba(255, 0, 0, 0.5)",
+                            0: "rgba(0, 0, 255, 0.5)"
                         }
-                     )
+                        )
 
     fig.update_layout(template='plotly_white',
                       scene=dict(aspectratio=dict(x=1, y=1, z=1))
                       )
     fig.update_xaxes(showline=True, linewidth=2, linecolor='black')
     fig.update_yaxes(showline=True, linewidth=2, linecolor='black')
-    #fig.update_zaxes(showline=True, linewidth=2, linecolor='black')
+    # fig.update_zaxes(showline=True, linewidth=2, linecolor='black')
     fig.update_traces(marker=dict(size=6,
                                   opacity=0.5,
-                                  #line=dict(width=2, color='DarkSlateGrey')
+                                  # line=dict(width=2, color='DarkSlateGrey')
                                   ),
                       )
 
@@ -140,8 +139,6 @@ def PCA():
     )
 
     fig.update_layout(scene_camera=camera, scene_dragmode='orbit')
-
-
 
     # fig.update_layout(shapes=[
     #     # unfilled rectange
@@ -155,12 +152,10 @@ def PCA():
     # y1 = 1,
     # line = {"width": 1, "color": "black"})])
 
-
     # Create graphJSON
     pca_plot = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
     return render_template('cheminf/PCA.html', user_datasets=list(current_user.datasets), pca_plot=pca_plot)
-
 
 @bp.route('/QSAR-build', methods=('GET', 'POST'))
 @login_required
@@ -173,25 +168,37 @@ def QSAR_build():
     if request.method == 'GET':
         return render_template('cheminf/QSAR-build.html', user_datasets=list(current_user.datasets), user=current_user)
 
-    dataset_selection = request.form['dataset-selection'].strip()
-    desc_selection = request.form['descriptor-selection'].strip()
-    alg_selection = request.form['algorithm-selection'].strip()
-    type_selection = request.form['type-selection'].strip()
+    dataset_selection = request.form.getlist('dataset-selection')
+    desc_selection = request.form.getlist('descriptor-selection')
+    alg_selection = request.form.getlist('algorithm-selection')
+    type_selection = request.form.getlist('type-selection')
+    name_list = []
+    for element in itertools.product(*[dataset_selection, desc_selection, alg_selection, type_selection]):
+        name_list.append('&'.join(element))
 
-    name = f'{dataset_selection}-{desc_selection}-{alg_selection}-{type_selection}'
-    try:
-        current_user.launch_task('build_qsar',
-                                 f'Building QSAR Model on {name}',
-                                 current_user.id,
-                                 dataset_selection,
-                                 desc_selection,
-                                 alg_selection,
-                                 type_selection
-                                 )
+    # name = f'{dataset_selection}-{desc_selection}-{alg_selection}-{type_selection}'
+    for name in name_list:
+        name_string = name.split("&")
+        dataset = name_string[0]
+        desc = name_string[1]
+        alg = name_string[2]
+        type1 = name_string[3]
+
+        try:
+            current_user.launch_task('build_qsar',
+                                     f'Building QSAR Model on {name}',
+                                     current_user.id,
+                                     dataset,
+                                     desc,
+                                     alg,
+                                     type1
+                                     )
+
+
+        except exc.OperationalError as err:
+            flash("Failed to submit model, please try again", 'error')
+
         db.session.commit()
-    except exc.OperationalError as err:
-        flash("Failed to submit model, please try again", 'error')
-
     return redirect(url_for('cheminf.QSAR_build'))
 
 
@@ -203,7 +210,6 @@ def QSAR_predict():
 
     """
 
-
     user_qsar_models = list(QSARModel.query.with_entities(QSARModel.user_id,
                                                           QSARModel.name
                                                           ).filter_by(user_id=current_user.id).all())
@@ -211,10 +217,8 @@ def QSAR_predict():
     if request.method == 'GET':
         return render_template('cheminf/QSAR-predict.html', user_qsar_models=user_qsar_models)
 
-
     sdfile = request.files['predict-file']
-    model_name = request.form['model-selection'].strip()
-
+    model_name = request.form.getlist('model-selection')
 
     error = None
 
@@ -230,7 +234,6 @@ def QSAR_predict():
         user_uploaded_file = os.path.join(current_app.instance_path, compound_filename)
         name = ntpath.basename(user_uploaded_file).split('.')[0]
 
-
         sdfile.save(user_uploaded_file)
 
         mols_df = PandasTools.LoadSDF(user_uploaded_file)
@@ -238,26 +241,26 @@ def QSAR_predict():
 
         mols_df['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
         mols_df['inchi'] = [Chem.MolToInchi(mol) for mol in mols_df.ROMol]
+        mols_df_trim = mols_df
 
         if mols_df.empty:
             error = 'No compounds in SDFile'
 
         if not error:
+            for model in model_name:
+                qsar_model = QSARModel.query.filter_by(name=model).first()
+                sklearn_model = pickle.loads(qsar_model.sklearn_model)
 
-            qsar_model = QSARModel.query.filter_by(name=model_name).first()
-            sklearn_model = pickle.loads(qsar_model.sklearn_model)
-
-            X_predict = chem_io.get_desc(mols_df, qsar_model.descriptors)
-
-            mols_df_trim = mols_df.set_index('compound_id').loc[X_predict.index]
-
-            mols_df_trim[f'{model_name}_Predictions'] = sklearn_model.predict(X_predict)
+                X_predict = chem_io.get_desc(mols_df_trim, qsar_model.descriptors)
+                mols_df_trim = mols_df_trim.set_index('compound_id').loc[X_predict.index]
+                mols_df_trim[f'{model}_Predictions'] = sklearn_model.predict(X_predict)
+                mols_df_trim.reset_index().drop(columns=['compound_id'])
+                mols_df_trim['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
 
             PandasTools.WriteSDF(mols_df_trim, user_uploaded_file,
                                  properties=mols_df_trim.drop('ROMol', axis=1).columns)
             return flask.send_file(user_uploaded_file,
                                    download_name=compound_filename.replace('.sdf', '_predicted.sdf'))
-
 
     if error:
         flash(error, 'danger')
@@ -269,9 +272,9 @@ if __name__ == '__main__':
     from app import create_app
 
     app = create_app()
-    #app.app_context().push()
+    # app.app_context().push()
     query_statement = db.session.query(Dataset).innerjoin(Dataset,
-                                                       Dataset.id == Chemical.dataset_id) \
-                        .filter_by(dataset_name=1, user_id=1) \
-                        .first()
+                                                          Dataset.id == Chemical.dataset_id) \
+        .filter_by(dataset_name=1, user_id=1) \
+        .first()
     print(query_statement)
