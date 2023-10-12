@@ -2,7 +2,7 @@
 
 ![repo version](https://img.shields.io/badge/Version-v.%200.2-green)
 
-*Added regression QSAR modeling module (experimental)
+*Added regression QSAR modeling module and multiple selection function (experimental)
 ### BASIC SETUP
 This app is a Flask-based, online chemical data analysis platform.
 
