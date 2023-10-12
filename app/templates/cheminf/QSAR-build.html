@@ -56,7 +56,7 @@
 
                     <div class="col-lg-12">
                         <h6>Select Dataset: </h6>
-                        <select class="form-control" name="dataset-selection">
+                        <select data-placeholder="Choose or type the dataset name..." multiple class="chosen-select" name="dataset-selection">
                         {% for dataset in user_datasets %}
                             <option value="{{ dataset.dataset_name }}"> {{ dataset.dataset_name }}</option>
                         {% endfor %}
@@ -67,42 +67,42 @@
                     <div class="col-lg-4">
                         <h6>Select Features: </h6>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="descriptor-selection" value="ECFP6" checked>
-                            <label class="form-check-label" for="radioECFP6">ECFP6</label>
+                            <input type="checkbox" class="form-check-input" name="descriptor-selection" value="ECFP6" checked>
+                            <label class="form-check-label" for="checkECFP6">ECFP6</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="descriptor-selection" value="FCFP6">
-                            <label class="form-check-label" for="radioFCFP6">FCFP6</label>
+                            <input type="checkbox" class="form-check-input" name="descriptor-selection" value="FCFP6">
+                            <label class="form-check-label" for="checkFCFP6">FCFP6</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="descriptor-selection" value="RDKit">
-                            <label class="form-check-label" for="radioRdkit">RDKit Descriptors</label>
+                            <input type="checkbox" class="form-check-input" name="descriptor-selection" value="RDKit">
+                            <label class="form-check-label" for="checkRdkit">RDKit Descriptors</label>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <h6>Select Algorithm: </h6>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="algorithm-selection" value="RF" checked>
-                            <label class="form-check-label" for="radioRF">Random Forest (RF)</label>
+                            <input type="checkbox" class="form-check-input" name="algorithm-selection" value="RF" checked>
+                            <label class="form-check-label" for="checkRF">Random Forest (RF)</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="algorithm-selection" value="kNN">
-                            <label class="form-check-label" for="radiokNN">k-Nearest Neighbors (kNN)</label>
+                            <input type="checkbox" class="form-check-input" name="algorithm-selection" value="kNN">
+                            <label class="form-check-label" for="checkkNN">k-Nearest Neighbors (kNN)</label>
                         </div>
                         <div class="form-check">
-                            <input type="radio" class="form-check-input" name="algorithm-selection" value="SVM">
-                            <label class="form-check-label" for="radioSVM">Support Vector Machine (SVM) </label>
+                            <input type="checkbox" class="form-check-input" name="algorithm-selection" value="SVM">
+                            <label class="form-check-label" for="checkSVM">Support Vector Machine (SVM) </label>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <h6>Select Features: </h6>
-                        <div class="form-check">
+                        <h6>Select Activity: </h6>
+                        <div class="form-radio">
                             <input type="radio" class="form-check-input" name="type-selection" value="Classification" checked>
-                            <label class="form-check-label" for="radioECFP6">Classification</label>
+                            <label class="form-check-label" for="checkECFP6">Classification</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-radio">
                             <input type="radio" class="form-check-input" name="type-selection" value="Regression">
-                            <label class="form-check-label" for="radioFCFP6">Regression</label>
+                            <label class="form-check-label" for="checkFCFP6">Regression</label>
                         </div>
                     </div>
 
@@ -200,5 +200,20 @@
         </div>
         {% endif %}
     </div>
+
+
+    <script type='text/javascript'>
+
+
+    $(".chosen-select").chosen({
+    no_results_text: "Oops, no matching results!",
+    width:"200%"}
+    )
+
+
+    </script>
+
+
+
 
 {% endblock %}
