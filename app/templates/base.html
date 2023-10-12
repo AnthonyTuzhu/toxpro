@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ciipro.css') }}">
     <link href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.min.css" rel="stylesheet"/>
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
             integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
@@ -28,6 +29,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
     <script src="http://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
 {#    <script src="http://cdn.datatables.net/1.10.22/js/dataTables.bootstrap.min.js"></script>#}
 </head>
 <!-- Google tag (gtag.js) -->
@@ -54,11 +56,20 @@
                 <li class="active">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">ToxiVerse</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
+                        {% if current_user.is_advanced %}
+                        <li>
+                            <a href={{ url_for('toxpro.datasets') }}>Datasets</a>
+                            <a href={{ url_for('toxpro.assayProfile') }}>Assay Profiler</a>
+                            <a href={{ url_for('toxpro.toxdata') }}>ToxiVerse Database</a>
+                            <a href={{ url_for('toxpro.AdvancedFunctions') }}>Advanced Functions</a>
+                        </li>
+                        {% else %}
                         <li>
                             <a href={{ url_for('toxpro.datasets') }}>Datasets</a>
                             <a href={{ url_for('toxpro.assayProfile') }}>Assay Profiler</a>
                             <a href={{ url_for('toxpro.toxdata') }}>ToxiVerse Database</a>
                         </li>
+                        {% endif %}
                     </ul>
                 </li>
 
