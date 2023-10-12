@@ -51,7 +51,7 @@ def get_class_stats(model, X, y):
 
     return {'ACC': acc, 'F1-Score': f1_sc, 'AUC': roc_auc, 'Cohen\'s Kappa': cohen_kappa,
             'MCC': matthews_corr, 'Precision/PPV': precision, 'Recall': recall, 'Specificity': specificity, 'CCR': ccr,
-            'Explained-variance': None, 'Max-error': None, 'Mean-squared-error': None,
+            'R2-score': None, 'Explained-variance': None, 'Max-error': None, 'Mean-squared-error': None,
             'Mean-absolute-percentage-error': None, 'D2-pinball-score': None
             }
 
@@ -62,7 +62,9 @@ def get_class_stats(model, X, y):
 class_scoring = {'ACC': make_scorer(accuracy_score), 'F1-Score': make_scorer(f1_score),
                  'AUC': make_scorer(roc_auc_score),
                  'Cohen\'s Kappa': make_scorer(cohen_kappa_score), 'MCC': make_scorer(matthews_corrcoef),
-                 'Precision': make_scorer(precision_score), 'Recall': make_scorer(recall_score)
+                 'Precision': make_scorer(precision_score), 'Recall': make_scorer(recall_score),
+                 'R2-score': None, 'Max-error': None, 'Mean-squared-error': None,
+                 'Mean-absolute-percentage-error': None, 'D2-pinball-score': None
                  }
 
 
