@@ -22,6 +22,7 @@ def build_qsar(user_id, dataset_name, descriptors, algorithm, type):
      this is necessary to be able to submit as a task in redis. """
 
     job = get_current_job()
+    # if Queue.started_job_registry is None:
     job.meta['progress'] = 'Creating Features...'
     job.save_meta()
     query_statement = db.session.query(Chemical).join(Dataset,
