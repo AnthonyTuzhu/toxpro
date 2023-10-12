@@ -42,7 +42,7 @@
 
                         <div class="col-6">
                           <label for="model-selection">Select QSAR model:</label>
-                          <select class="form-control" name="model-selection">
+                          <select data-placeholder="Choose or type the model name..." multiple class="chosen-select" name="model-selection">
                             {% for qsar_model in user_qsar_models %}
                                 <option value="{{ qsar_model.name }}"> {{ qsar_model.name }}</option>
                             {% endfor %}
@@ -65,5 +65,14 @@
             </div>
           </div>
         </div>
+
+    <script type='text/javascript'>
+
+
+    $(".chosen-select").chosen({
+    no_results_text: "Oops, no matching results!"})
+
+
+    </script>
 
 {% endblock %}
