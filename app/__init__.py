@@ -64,6 +64,12 @@ def create_app(test_config=None):
     from .emails import mail
     mail.init_app(app)
 
+    def num_digit(flt, num):
+        if flt is not None:
+            return round(flt, num)
+
+    app.jinja_env.globals.update(num_digit=num_digit)
+
     from .errors import not_found, internal_error
     # errors
     # TODO: put these in their own module

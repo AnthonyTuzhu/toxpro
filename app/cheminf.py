@@ -157,6 +157,7 @@ def PCA():
 
     return render_template('cheminf/PCA.html', user_datasets=list(current_user.datasets), pca_plot=pca_plot)
 
+
 @bp.route('/QSAR-build', methods=('GET', 'POST'))
 @login_required
 def QSAR_build():
@@ -219,13 +220,15 @@ def QSAR_predict():
 
     sdfile = request.files['predict-file']
     model_name = request.form.getlist('model-selection')
+    output_type = request.form['output-type'].strip()
+    activity_col = request.form['smiles-column'].strip() or 'SMILES'
 
     error = None
 
     if not sdfile:
         error = "No SDFile was attached."
 
-    if sdfile and not sdfile.filename.rsplit('.', 1)[1] in ['sdf']:
+    if sdfile and not sdfile.filename.rsplit('.', 1)[1] in ['csv', 'sdf']:
         error = "The file is not an SDF"
 
     if sdfile:
@@ -236,31 +239,92 @@ def QSAR_predict():
 
         sdfile.save(user_uploaded_file)
 
-        mols_df = PandasTools.LoadSDF(user_uploaded_file)
-        os.remove(user_uploaded_file)
+        if sdfile and sdfile.filename.rsplit('.', 1)[1] in ['csv']:
+            mols_df = pd.read_csv(user_uploaded_file)
+            PandasTools.AddMoleculeColumnToFrame(mols_df, smilesCol=activity_col)
+            mols_df = mols_df[mols_df.ROMol.notnull()]
 
-        mols_df['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
-        mols_df['inchi'] = [Chem.MolToInchi(mol) for mol in mols_df.ROMol]
-        mols_df_trim = mols_df
+            os.remove(user_uploaded_file)
 
-        if mols_df.empty:
-            error = 'No compounds in SDFile'
+            mols_df['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
+            mols_df['inchi'] = [Chem.MolToInchi(mol) for mol in mols_df.ROMol]
+            mols_df_trim = mols_df
 
-        if not error:
-            for model in model_name:
-                qsar_model = QSARModel.query.filter_by(name=model).first()
-                sklearn_model = pickle.loads(qsar_model.sklearn_model)
+            if mols_df.empty:
+                error = 'No compounds in SDFile'
 
-                X_predict = chem_io.get_desc(mols_df_trim, qsar_model.descriptors)
-                mols_df_trim = mols_df_trim.set_index('compound_id').loc[X_predict.index]
-                mols_df_trim[f'{model}_Predictions'] = sklearn_model.predict(X_predict)
-                mols_df_trim.reset_index().drop(columns=['compound_id'])
-                mols_df_trim['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
+            if not error:
+                for model in model_name:
+                    qsar_model = QSARModel.query.filter_by(name=model).first()
+                    sklearn_model = pickle.loads(qsar_model.sklearn_model)
 
-            PandasTools.WriteSDF(mols_df_trim, user_uploaded_file,
-                                 properties=mols_df_trim.drop('ROMol', axis=1).columns)
-            return flask.send_file(user_uploaded_file,
-                                   download_name=compound_filename.replace('.sdf', '_predicted.sdf'))
+                    X_predict = chem_io.get_desc(mols_df_trim, qsar_model.descriptors)
+                    mols_df_trim = mols_df_trim.set_index('compound_id').loc[X_predict.index]
+                    mols_df_trim[f'{model}_Predictions'] = sklearn_model.predict(X_predict)
+                    mols_df_trim.reset_index().drop(columns=['compound_id'])
+                    mols_df_trim['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
+
+                if output_type == 'CSV':
+                    import io
+                    mem = io.BytesIO()
+                    mem.write(mols_df_trim.drop(['ROMol', 'compound_id'], axis=1).to_csv().encode())
+                    mem.seek(0)
+                    return flask.send_file(
+                        mem,
+                        as_attachment=True,
+                        download_name=f"{name}_predicted.csv",
+                        mimetype="text/plain",
+                    )
+
+                if output_type == 'SDF':
+                    download_file = os.path.join(current_app.instance_path + f"{compound_filename.split('.')[0]}.sdf")
+                    PandasTools.WriteSDF(mols_df_trim, download_file,
+                                         properties=mols_df_trim.drop('ROMol', axis=1).columns)
+                    return flask.send_file(download_file,
+                                           as_attachment=True,
+                                           download_name=f"{name}_predicted.sdf")
+
+        if sdfile and sdfile.filename.rsplit('.', 1)[1] in ['sdf']:
+            mols_df = PandasTools.LoadSDF(user_uploaded_file)
+
+            os.remove(user_uploaded_file)
+
+            mols_df['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
+            mols_df['inchi'] = [Chem.MolToInchi(mol) for mol in mols_df.ROMol]
+            mols_df_trim = mols_df
+
+            if mols_df.empty:
+                error = 'No compounds in SDFile'
+
+            if not error:
+                for model in model_name:
+                    qsar_model = QSARModel.query.filter_by(name=model).first()
+                    sklearn_model = pickle.loads(qsar_model.sklearn_model)
+
+                    X_predict = chem_io.get_desc(mols_df_trim, qsar_model.descriptors)
+                    mols_df_trim = mols_df_trim.set_index('compound_id').loc[X_predict.index]
+                    mols_df_trim[f'{model}_Predictions'] = sklearn_model.predict(X_predict)
+                    mols_df_trim.reset_index().drop(columns=['compound_id', 'ID'])
+                    mols_df_trim['compound_id'] = ['mol_{}'.format(i) for i in range(mols_df.shape[0])]
+
+                if output_type == 'CSV':
+                    import io
+                    mem = io.BytesIO()
+                    mem.write(mols_df_trim.drop(['ROMol', 'compound_id', 'ID'], axis=1).to_csv().encode())
+                    mem.seek(0)
+                    return flask.send_file(
+                        mem,
+                        as_attachment=True,
+                        download_name=f"{name}_predicted.csv",
+                        mimetype="text/plain",
+                    )
+
+                if output_type == 'SDF':
+                    PandasTools.WriteSDF(mols_df_trim, user_uploaded_file,
+                                         properties=mols_df_trim.drop('ROMol', axis=1).columns)
+                    return flask.send_file(user_uploaded_file,
+                                           as_attachment=True,
+                                           download_name=f"{name}_predicted.sdf")
 
     if error:
         flash(error, 'danger')

@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, jsonify, send_from_directory, current_app,
-    send_file, Response
+    send_file, abort, Response
 )
 from werkzeug.utils import secure_filename
 
@@ -11,18 +11,36 @@ import plotly
 import plotly.express as px
 import json, os, ntpath
 
-from app.db_models import User, Dataset, Chemical, db
+from app.db_models import User, Dataset, Chemical, db, Permission
 import app.master_db as master_db
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_manager
 from sqlalchemy import exc
 import pandas as pd
 from plotly.graph_objs import *
+from functools import wraps
 
 import app.pubchem as pc
 
 bp = Blueprint('toxpro', __name__)
 
 TOXICITY_ENDPOINT_INFO = pd.read_csv('data/toxicity-endpoint-info.csv', index_col=0)
+
+
+def permission_required(permission):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if not current_user.can(permission):
+                abort(403)
+                return f(*args, **kwargs)
+
+        return decorated_function()
+
+    return decorator
+
+
+def advanced_required(f):
+    return permission_required(Permission.ADVANCED)(f)
 
 
 # this is necessary for declaring
@@ -69,6 +87,16 @@ def datasets():
     return render_template('toxpro/datasets.html', user_datasets=list(current_user.datasets))
 
 
+@bp.route('/AdvancedFunctions', methods=['GET'])
+@login_required
+def AdvancedFunctions():
+    """
+    displays the homepage
+
+    """
+    return render_template('toxpro/advancedfunctions.html')
+
+
 @bp.route('/upload_dataset', methods=['POST'])
 @login_required
 def upload_dataset():
@@ -86,13 +114,15 @@ def upload_dataset():
     sdfile = request.files['compound_file']
     activity_col = request.form['act-id-property'].strip() or 'Activity'
     compound_id_col = request.form['cmp-id-property'].strip() or 'CMP_ID'
+    smiles_col = request.form['smiles-id-property'].strip() or 'SMILES'
+    dataset_type = request.form['dataset-type'].strip()
 
     error = None
 
     if not sdfile:
         error = "No SDFile was attached."
 
-    if sdfile and not sdfile.filename.rsplit('.', 1)[1] in ['sdf']:
+    if sdfile and not sdfile.filename.rsplit('.', 1)[1] in ['csv','sdf']:
         error = "The file is not an SDF"
 
     if sdfile:
@@ -103,7 +133,7 @@ def upload_dataset():
 
         # create the dataset
         try:
-            dataset = Dataset(user_id=current_user.id, dataset_name=name)
+            dataset = Dataset(user_id=current_user.id, dataset_name=name, type=dataset_type)
             db.session.add(dataset)
             db.session.commit()
         except exc.IntegrityError:
@@ -112,20 +142,27 @@ def upload_dataset():
             flash(error, 'danger')
             return redirect(url_for('toxpro.datasets'))
 
-        # I think we have to save this in order to use it, not sure if we car read it otherwise
+        # I think we have to save this in order to use it, not sure if we can read it otherwise
         sdfile.save(user_uploaded_file)
 
-        mols_df = PandasTools.LoadSDF(user_uploaded_file)
+        if sdfile and sdfile.filename.rsplit('.', 1)[1] in ['csv']:
+            mols_df = pd.read_csv(user_uploaded_file)
+            PandasTools.AddMoleculeColumnToFrame(mols_df, smilesCol=smiles_col)
+            mols_df = mols_df[mols_df.ROMol.notnull()]
+
+        if sdfile and sdfile.filename.rsplit('.', 1)[1] in ['sdf']:
+            mols_df = PandasTools.LoadSDF(user_uploaded_file)
+
         os.remove(user_uploaded_file)
 
         if mols_df.empty:
-            error = 'No compounds in SDFile'
+            error = 'No compounds in the file'
         if activity_col not in mols_df.columns:
-            error = f'Activity {activity_col} not in SDFile.'
+            error = f'Activity {activity_col} not in the file.'
         if compound_id_col not in mols_df.columns:
-            error = f'Compound ID {compound_id_col} not in SDFile.'
+            error = f'Compound ID {compound_id_col} not in the file.'
 
-        if error == None:
+        if error == None and dataset_type == 'Binary':
 
             # coerce activity column to be
             # integer
@@ -153,6 +190,32 @@ def upload_dataset():
             num_chemicals = len(list(dataset.chemicals))
             flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
             return redirect(url_for('toxpro.datasets'))
+
+        elif error == None and dataset_type == 'Continuous':
+            mols_df[activity_col] = pd.to_numeric(mols_df[activity_col], errors='coerce')
+            mols_df = mols_df[mols_df[activity_col].notnull()]
+            mols_df[activity_col] = mols_df[activity_col].astype(int)
+
+            mols_df = mols_df.sort_values(activity_col, ascending=False)
+            mols_df = mols_df.drop_duplicates(compound_id_col, keep='first')
+
+            for i, row in mols_df.iterrows():
+                mol = row.ROMol
+                activity = row[activity_col]
+                cmp_id = row[compound_id_col]
+                inchi = Chem.MolToInchi(mol)
+
+                if cmp_id and inchi and activity:
+                    chem = Chemical(inchi=inchi, dataset_id=dataset.id, activity=activity, compound_id=cmp_id)
+                    dataset.chemicals.append(chem)
+
+            db.session.add(dataset)
+            db.session.commit()
+
+            num_chemicals = len(list(dataset.chemicals))
+            flash(f'Uploaded {name} as a new dataset; Added {num_chemicals} chemicals', 'success')
+            return redirect(url_for('toxpro.datasets'))
+
         else:
             db.session.delete(dataset)
             db.session.commit()
@@ -173,9 +236,8 @@ def remove_dataset():
     dataset_selection = request.form['dataset-selection'].strip()
     do_what_with_dataset = request.form['action']
 
-    # there are two buttons one to download
-    # and one to remove.
-    if do_what_with_dataset == 'Download dataset':
+    # there are two buttons one to download and one to remove.
+    if do_what_with_dataset == 'Download dataset as CSV file':
         query_statement = db.session.query(Chemical).join(Dataset,
                                                           Dataset.id == Chemical.dataset_id) \
             .filter(Dataset.dataset_name == dataset_selection) \

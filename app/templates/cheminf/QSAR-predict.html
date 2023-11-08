@@ -40,7 +40,7 @@
                    <form action="{{ url_for('cheminf.QSAR_predict') }}" method="post" enctype="multipart/form-data">
                    <div class="row">
 
-                        <div class="col-6">
+                        <div class="col-md-6">
                           <label for="model-selection">Select QSAR model:</label>
                           <select data-placeholder="Choose or type the model name..." multiple class="chosen-select" name="model-selection">
                             {% for qsar_model in user_qsar_models %}
@@ -49,14 +49,31 @@
                           </select>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label for="predict-file">Select SDFile:</label>
                             <div class="input-group">
                                 <input type="file" class="form-control" name="predict-file">
                                 <button type="submit" class="btn btn-danger">Predict</button>
                             </div>
                         </div>
+
+                   <div class="col-md-6">
+                            <h6>Select Output File Format: </h6>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="output-type" value="CSV" checked>
+                                <label class="form-check-label" for="radioCSV">CSV</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="output-type" value="SDF">
+                                <label class="form-check-label" for="radioSDF">SDF</label>
+                            </div>
+                        </div>
                     </div>
+
+                  <h6>SMILES column name in the CSV file: </h6>
+                        <div class="col-sm-6">
+                          <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm", name="smiles-column">
+                        </div>
                     </form>
                     {% endif %}
 

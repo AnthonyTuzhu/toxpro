@@ -162,16 +162,16 @@
                         <tr>
                             <td>{{ qsar_model.name }}</td>
                             <td>{{ qsar_model.type }}</td>
-                            <td>{{ qsar_model.cvresults.accuracy}}</td>
-                            <td>{{ qsar_model.cvresults.f1_score }}</td>
-                            <td>{{ qsar_model.cvresults.precision }}</td>
-                            <td>{{ qsar_model.cvresults.recall }}</td>
-                            <td>{{ qsar_model.cvresults.specificity }}</td>
-                            <td>{{ qsar_model.cvresults.r2_score }}</td>
-                            <td>{{ qsar_model.cvresults.max_error }}</td>
-                            <td>{{ qsar_model.cvresults.mean_squared_error }}</td>
-                            <td>{{ qsar_model.cvresults.mean_absolute_percentage_error }}</td>
-                            <td>{{ qsar_model.cvresults.pinball_score }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.accuracy,2)}}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.f1_score,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.precision,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.recall,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.specificity,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.r2_score,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.max_error,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.mean_squared_error,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.mean_absolute_percentage_error,2) }}</td>
+                            <td>{{ num_digit(qsar_model.cvresults.pinball_score,2) }}</td>
 
                         </tr>
                             {% else %}
@@ -207,7 +207,7 @@
 
     $(".chosen-select").chosen({
     no_results_text: "Oops, no matching results!",
-    width:"200%"}
+    width:"100%"}
     )
 
 

@@ -23,9 +23,7 @@
                       then they are assumed to be Activity and CMP_ID.
                   </p>
                   <h5>Activity Property</h5>
-                  <p>The activity must be a binarized property of every chemical (i.e., every chemical must be assigned
-                  a value of either 1 or 0).  Any chemicals without this property or any value other than 1 or 0 will
-                  not be uploaded.</p>
+                  <p>The activity must be binarized or continuous.</p>
                   <h5>Compound ID Property</h5>
                   <p>Every chemical must have a unique compound identifier (ID).  It is important to make sure this field
                   is unique (i.e., no duplicate values). </p>
@@ -41,20 +39,37 @@
               <div class="card-body">
                   <form action="{{ url_for('toxpro.upload_dataset') }}" method="post" enctype="multipart/form-data" name="">
                       <h5 class="card-title">Upload a dataset.</h5>
-                      <p class="card-text">Please select a file to upload a new dataset. Datasets should be in an SDFile.</p>
+                      <p class="card-text">Please select a file to upload a new dataset. Datasets should be in an CSV or SDF file. For CSV file, it must contain
+                      a column named "SMILES" contains SMILES information for each record.</p>
 
                       <input type="file" class="form-control-file top-padding btm-padding" name="compound_file" id="compound_file">
 
-                       <label for="cmp-id" class="card-text">Compound ID (has to be a property in the SDFile):</label>
+                       <label for="cmp-id" class="card-text">Compound ID (has to be a property in the SDFile or a column in CSV file):</label>
                         <div class="input-group input-group-sm mb-3">
                           <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm", name="cmp-id-property">
                         </div>
 
 
-
-                        <label for="act-id" class="card-text">Activity name (has to be a property in the SDFile):</label>
+                        <label for="act-id" class="card-text">Activity name (has to be a property in the SDF or a column in CSV file):</label>
                         <div class="input-group input-group-sm mb-3">
                           <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm", name="act-id-property">
+                        </div>
+
+                        <label for="act-id" class="card-text">SMILES column name (Only for CSV file):</label>
+                        <div class="input-group input-group-sm mb-3">
+                          <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm", name="smiles-id-property">
+                        </div>
+
+                        <div class="col-sm-4">
+                            <h6>Select Dataset Type: </h6>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="dataset-type" value="Binary" checked>
+                                <label class="form-check-label" for="radioBinary">Binary</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" name="dataset-type" value="Continuous">
+                                <label class="form-check-label" for="radioContinuous">Continuous</label>
+                            </div>
                         </div>
 
 
@@ -100,9 +115,11 @@
                     {% endfor %}
                   </select>
 
+{#                  <h6 id="num_acts", style="padding-top: 2em">#}
+{#                      Num Actives:  <span id="num_act_text" class="prof-attr cmp-active"></span></h6>#}
+{#                  <h6 id="num_inacts">#}
+{#                      Num Inactives:  <span id="num_inact_text" class="prof-attr cmp-inactive"></span></h6>#}
 
-                      <h6 id="num_acts", style="padding-top: 2em">Num Actives:  <span id="num_act_text" class="prof-attr cmp-active"></span></h6>
-                      <h6 id="num_inacts">Num Inactives:  <span id="num_inact_text" class="prof-attr cmp-inactive"></span></h6>
 
                   <table id="data" class="table compact">
                     <thead>
@@ -123,7 +140,7 @@
                   <input type="submit" style="color: white;"
                          name="action"
                          class="btn btn-success btn-padding"
-                         value="Download dataset">
+                         value="Download dataset as CSV file">
                 </form>
 
                 </div>
