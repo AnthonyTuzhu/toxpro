@@ -16,3 +16,8 @@ PyJWT==2.6.0
 numpy==1.23.2
 requests==2.30.0
 python-dotenv==1.0.0
+Flask==2.2
+matplotlib==3.7.0
+seaborn==0.13.0
+wheel==0.41.3
+alembic==1.12.1
