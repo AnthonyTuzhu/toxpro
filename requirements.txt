@@ -15,4 +15,4 @@ rq==1.11.1
 PyJWT==2.6.0
 numpy==1.23.2
 requests==2.30.0
-
+python-dotenv==1.0.0
