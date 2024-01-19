@@ -170,4 +170,3 @@ docker compose -f docker-compose-do.yml up
 or this
 ```dockerfile
 docker compose -f docker-compose-do.yml up -d --build
-```

@@ -14,11 +14,13 @@ services:
         env_file:
             - docker-environment-do.env
         ports:
-            - "80:5000"
+            - "443:5000"
         image: toxpro:lastest
         volumes:
             - ./instance/:/home/toxpro/instance
             - ./data/:/home/toxpro/data
+            - ./root/ssl/fullchain.pem:/home/toxpro/fullchain.pem
+            - ./root/ssl/privkey.pem:/home/toxpro/fullchain.pem
         entrypoint: ["./boot.sh"]
         stdin_open: true
         tty: true
@@ -34,7 +36,6 @@ services:
         volumes:
             - ./instance/:/home/toxpro/instance
             - ./data/:/home/toxpro/data
-
 # this is necessary for the workers to
 # share writing to the SQLite I believ
 volumes:
