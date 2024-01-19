@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y netcat-traditional
 
 
 COPY app app
+RUN pip install pyopenssl
 RUN mkdir logs
 RUN mkdir data
 RUN mkdir instance # this is necessary for digital ocean

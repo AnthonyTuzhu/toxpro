@@ -1,10 +1,11 @@
 # Welcome to ToxiVerse Project
 
-![repo version](https://img.shields.io/badge/Version-v.%200.2-green)
+![repo version](https://img.shields.io/badge/Version-v.%200.2.1-green)
 
-*Added regression QSAR modeling module and multiple selection function (experimental)
-### BASIC SETUP
-This app is a Flask-based, online chemical data analysis platform.
+*Added regression QSAR modeling module (experimental)
+Fixed some bugs
+### Running in PyCharm (IDE)
+
 
 To open this project on your computer, you need to set up the conda env by using the `requirements.txt` file to install
 the necessary python dependencies.
@@ -20,55 +21,71 @@ then you need to activate
 ```
 conda activate toxpro
 ```
-then use pip to install dependencies
+
+close the terminal in IDE (e.g., Pycharm), open any .py file under toxpro/app and re-open the terminal in IDE
+
+then use pip to install dependencies, for example:
 
 ```
-pip install -r requirements.txt
+...\anaconda3\envs\toxpro\python.exe -m pip install -r requirements.txt
 ```
-You need to activate it as interpreter in the conda environment.
 
-then download the database folders on Google Drive:
+then download the database folders on Google Drive because Github lacks support to sharing large files:
 https://drive.google.com/drive/folders/1gBxySt2uk6XNflRyA7mf5y-zqY0p2ErS?usp=drive_link (data) and
 https://drive.google.com/drive/folders/1a-lKJ-JwjyY-v3J4DpRgCP7prCEf2WQP?usp=drive_link (instance).
 
 Since google drive download folders as zipped file, drag the folders to the work respiratory location (e.g., toxpro, replace existing ones if there are).
 
-Remember to set up Flask configuration (if you are using Pycharm):
+Remember to set up class Config in the config.py:
 ```
-BIOASSAYS=toxpro\data\bioassays.tsv
-```
-
-```
-MASTER_DB_FILE=toxpro\instance\masterdb.db
+MASTER_DB_FILE = os.getenv('MASTER_DB_FILE')
+BIOASSAYS = os.getenv('BIOASSAYS')
+BIOPROFILE_DIR = os.getenv('BIOPROFILE')
 ```
 
-use __init__.py to intiate the Flask app (Target type: Script path, Target name):
-```
-toxpro\app\__init__.py
-```
+Intiate the Flask app by __init__.py
 
 
 Getting started using the Flask tutorial: https://flask.palletsprojects.com/en/2.0.x/tutorial
 
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xix-deployment-on-docker-containers
 
+### CAUTION : Docker is ESSENTIAL for QSAR module running: https://www.docker.com/blog/how-to-use-the-redis-docker-official-image/
+
+After installed the Docker app, you will need to run toxpro/docker_compose.yml to compose the environment and then click on "5000:5000" port in the "container" session of Docker
+
+Here is a tutorial for using it with flask: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+
+For master-database, since bioprofile is not completed, some table may raise ajax error. But it won't affect other information.
+
+## Run app in command lines
+
+If you want to run the app in command line, first cd the location of this app, for example: 
+```
+C:\Users\Anthony>cd toxpro
+```
+
+Similarily, install requirements.txt
+```
+python -m pip install -r requirements.txt
+```
+
+Download "data" and "instance" folder and put them under the app folder, set up class Config in the config.py, and run the flask app
+```
+flask run
+```
+
+To run Docker, use the docker-compose.yml:
+
+```
+docker-compose.exe -f docker-compose.yml -p toxpro up -d
+```
 
 ## Redis Queue, Docker and GUNICORN
 
 
 Redis Queue is a way to handle background tasks/jobs.  It requires a seperate server and installation outside
 of python.
-
-
-
-
-
-Docker is ESSENTIAL for QSAR module running: https://www.docker.com/blog/how-to-use-the-redis-docker-official-image/
-
-After installed the Docker app, you will need to run toxpro/docker_compose.yml to compose the environment and then click on "5000:5000" port in the "container" session of Docker
-
-Here is a tutorial for using it with flask: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
-
 
 
 
@@ -153,9 +170,3 @@ docker compose -f docker-compose-do.yml up
 or this
 ```dockerfile
 docker compose -f docker-compose-do.yml up -d --build
-```
-
-this is even betteR?  works when getting `There is already an active worker error`
-```dockerfile
-sudo docker compose -f docker-compose-do.yml up -d --build --force-recreate
-```
